@@ -2,6 +2,8 @@ import { reactive } from 'vue'
 
 export const gameState = reactive({
   phase: 'start', // 'start' | 'playing' | 'gameover'
+  playerName: '',
+  victory: false,
   score: 0,
   health: 100,
   level: 1,
@@ -17,10 +19,21 @@ export const gameState = reactive({
   bossActive: false,
   bossHealth: 0,
   bossMaxHealth: 500,
+  paused: false,
+  continueMode: false,
+  endRequested: false,
+  valuesCollected: {
+    innovation: 0,
+    kindness: 0,
+    teamwork: 0,
+    integrity: 0,
+    excellence: 0,
+  },
 })
 
 export function resetGameState() {
   gameState.phase = 'playing'
+  gameState.victory = false
   gameState.score = 0
   gameState.health = 100
   gameState.level = 1
@@ -36,4 +49,14 @@ export function resetGameState() {
   gameState.bossActive = false
   gameState.bossHealth = 0
   gameState.bossMaxHealth = 500
+  gameState.paused = false
+  gameState.continueMode = false
+  gameState.endRequested = false
+  gameState.valuesCollected = {
+    innovation: 0,
+    kindness: 0,
+    teamwork: 0,
+    integrity: 0,
+    excellence: 0,
+  }
 }

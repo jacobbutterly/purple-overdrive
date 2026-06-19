@@ -134,6 +134,15 @@ export class AudioSystem {
     this._playNoise(now, 0.5, 0.3, 100, this.sfxGain)
   }
 
+  sfxPowerupSpawn() {
+    if (!this.ctx) return
+    const now = this.ctx.currentTime
+    const notes = [330, 440, 554]
+    notes.forEach((f, i) => {
+      this._playOsc(now + i * 0.06, f, 0.07, 0.18, 'sine', this.sfxGain)
+    })
+  }
+
   sfxPowerup() {
     if (!this.ctx) return
     const now = this.ctx.currentTime
@@ -159,11 +168,35 @@ export class AudioSystem {
     this._playOsc(now + 0.5, 150, 0.4, 0.5, 'sawtooth', this.sfxGain)
   }
 
+  sfxSlackNotification() {
+    const audio = new Audio('/assets/audio/slack.mp3')
+    audio.volume = 0.6
+    audio.play().catch(() => {})
+  }
+
   sfxPassion() {
     if (!this.ctx) return
     const now = this.ctx.currentTime
     this._playOsc(now, 440, 0.35, 0.2, 'sawtooth', this.sfxGain)
     this._playOsc(now + 0.15, 660, 0.3, 0.2, 'sawtooth', this.sfxGain)
+  }
+
+  sfxVictory() {
+    if (!this.ctx) return
+    const now = this.ctx.currentTime
+    // Triumphant ascending fanfare
+    const melody = [523, 659, 784, 1047, 1319, 1047, 784, 1047, 1319]
+    melody.forEach((f, i) => {
+      this._playOsc(now + i * 0.12, f, 0.25, 0.2, 'sine', this.sfxGain)
+    })
+    // Bass hits
+    ;[0, 0.36, 0.72].forEach(t => {
+      this._playOsc(now + t, 130, 0.3, 0.18, 'square', this.sfxGain)
+    })
+    // Final chord
+    ;[523, 659, 784, 1047].forEach(f => {
+      this._playOsc(now + 1.1, f, 0.2, 0.6, 'sine', this.sfxGain)
+    })
   }
 
   destroy() {

@@ -8,7 +8,9 @@ export class JoystickSystem {
     this.deltaY = 0
     this.maxRadius = 80
     this.inverted = false
+    this.keys = {}
     this._setupListeners()
+    this._setupKeyboard()
   }
 
   _setupListeners() {
@@ -39,7 +41,42 @@ export class JoystickSystem {
     })
   }
 
+  _setupKeyboard() {
+    const { KeyCodes } = Phaser.Input.Keyboard
+    const s = this.scene
+    this.keys = s.input.keyboard.addKeys({
+      up: KeyCodes.UP,
+      down: KeyCodes.DOWN,
+      left: KeyCodes.LEFT,
+      right: KeyCodes.RIGHT,
+      w: KeyCodes.W,
+      a: KeyCodes.A,
+      s: KeyCodes.S,
+      d: KeyCodes.D,
+    })
+  }
+
+  _getKeyboardVelocity(speed) {
+    const { up, down, left, right, w, a, s, d } = this.keys
+    let kx = 0
+    let ky = 0
+    if (left.isDown || a.isDown) kx -= 1
+    if (right.isDown || d.isDown) kx += 1
+    if (up.isDown || w.isDown) ky -= 1
+    if (down.isDown || s.isDown) ky += 1
+    if (kx === 0 && ky === 0) return null
+    const len = Math.sqrt(kx * kx + ky * ky)
+    const sign = this.inverted ? -1 : 1
+    return {
+      vx: sign * (kx / len) * speed,
+      vy: sign * (ky / len) * speed,
+    }
+  }
+
   getVelocity(speed) {
+    const kv = this._getKeyboardVelocity(speed)
+    if (kv) return kv
+
     if (!this.active || (this.deltaX === 0 && this.deltaY === 0)) {
       return { vx: 0, vy: 0 }
     }

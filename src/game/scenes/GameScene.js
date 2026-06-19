@@ -40,6 +40,12 @@ export class GameScene extends Phaser.Scene {
     this.timeSinceLastHit = 0
     this.streakChecked2x = false
     this.streakChecked3x = false
+    this.streakChecked4x = false
+    this.streakChecked5x = false
+
+    // Overclock mode
+    this.overclockTimer = 0
+    this.overclockActive = false
 
     // Passion mode
     this.passionTimer = 0
@@ -79,6 +85,20 @@ export class GameScene extends Phaser.Scene {
 
     // Comic text pool
     this.comicTexts = []
+
+    // Keyboard pause
+    this.input.keyboard.on('keydown-ESC', () => this._togglePause())
+    this.input.keyboard.on('keydown-P', () => this._togglePause())
+  }
+
+  _togglePause() {
+    if (!this.gameRunning) return
+    gameState.paused = !gameState.paused
+    if (gameState.paused) {
+      this.audio.stopMusic()
+    } else {
+      this.audio.startMusic(this.currentLevelConfig.musicBPM)
+    }
   }
 
   _setupBackground() {
@@ -101,7 +121,12 @@ export class GameScene extends Phaser.Scene {
       gfx: this.add.graphics(),
       shield: false,
     }
-    this.player.gfx.setDepth(10)
+    this.player.gfx.setDepth(9)
+
+    this.player.emoji = this.add.text(this.W / 2, this.H / 2, '👾', {
+      fontSize: '36px',
+    }).setOrigin(0.5).setDepth(10)
+
     this._drawPlayer()
   }
 
@@ -109,31 +134,36 @@ export class GameScene extends Phaser.Scene {
     const g = this.player.gfx
     g.clear()
 
-    // Glow layers
-    const glowColors = [COLORS.playerGlow, COLORS.player]
-    const glowRadii = [this.player.radius + 12, this.player.radius + 6, this.player.radius]
-    glowRadii.forEach((r, i) => {
-      g.fillStyle(glowColors[Math.min(i, glowColors.length - 1)], i === 0 ? 0.15 : i === 1 ? 0.3 : 1)
-      g.fillCircle(this.player.x, this.player.y, r)
-    })
+    // Glow ring underneath emoji
+    g.fillStyle(COLORS.playerGlow, 0.18)
+    g.fillCircle(this.player.x, this.player.y, this.player.radius + 14)
+    g.fillStyle(COLORS.playerGlow, 0.12)
+    g.fillCircle(this.player.x, this.player.y, this.player.radius + 22)
 
     // Passion border
     if (this.passionActive) {
-      g.lineStyle(3, 0xff0000, 1)
-      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 4)
+      g.lineStyle(3, 0xff0000, 0.85)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 6)
     }
 
     // Integrity shield visual
     if (gameState.hasIntegrity) {
       g.lineStyle(2, COLORS.integrity, 0.6)
-      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 16)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 18)
     }
+
+    // Sync emoji position and facing direction
+    this.player.emoji.setPosition(this.player.x, this.player.y)
+    this.player.emoji.setScale(this.playerFacingLeft ? -1 : 1, 1)
   }
 
   _setupGroups() {
     this.enemies = []
     this.projectiles = []
     this.powerups = []
+    this.ripples = []
+    this.chainGfx = this.add.graphics()
+    this.chainGfx.setDepth(4)
   }
 
   _setupJoystick() {
@@ -150,11 +180,18 @@ export class GameScene extends Phaser.Scene {
 
   update(time, delta) {
     if (!this.gameRunning) return
+    if (gameState.paused) return
+
+    // Restart music if player chose to keep fighting
+    if (gameState.continueMode && !this._continueMusicRestarted) {
+      this._continueMusicRestarted = true
+      this.audio.startMusic(this.currentLevelConfig.musicBPM)
+    }
 
     const dt = delta / 1000
 
     this.elapsedTime += dt
-    const remaining = Math.max(0, TIMING.gameDuration - this.elapsedTime)
+    const remaining = gameState.continueMode ? 0 : Math.max(0, TIMING.gameDuration - this.elapsedTime)
     gameState.timeRemaining = Math.ceil(remaining)
 
     // Level transitions
@@ -176,6 +213,14 @@ export class GameScene extends Phaser.Scene {
       if (this.disruptionTimer <= 0) this._endDisruption()
     }
 
+    if (this.overclockActive) {
+      this.overclockTimer -= dt
+      if (this.overclockTimer <= 0) {
+        this.overclockActive = false
+        this._showFloatingText(this.player.x, this.player.y - 40, 'Overclock Ended', 0xffcc00)
+      }
+    }
+
     // Spawn
     if (this.spawnTimer >= this.currentLevelConfig.spawnInterval) {
       this.spawnTimer = 0
@@ -193,9 +238,10 @@ export class GameScene extends Phaser.Scene {
     this._updateTeammates(dt)
 
     // Auto fire
-    const effectiveFireRate = this.passionActive
+    let effectiveFireRate = this.passionActive
       ? this.currentFireRate * PLAYER.passionFireRateMult
       : this.currentFireRate
+    if (this.overclockActive) effectiveFireRate *= 0.4
     if (this.fireTimer >= effectiveFireRate && gameState.disruptionType !== 'noweapon') {
       this.fireTimer = 0
       this._autoFire()
@@ -209,6 +255,8 @@ export class GameScene extends Phaser.Scene {
 
     // Move powerups (float)
     this._updatePowerups(dt)
+    this._updateRipples(dt)
+    this._drawChains()
 
     // Collisions
     this._checkProjectileEnemyCollisions()
@@ -232,9 +280,18 @@ export class GameScene extends Phaser.Scene {
     // Redraw border flash
     this._updateBorderFlash()
 
-    // Game over
-    if (remaining <= 0) {
+    // End requested from continue screen
+    if (gameState.endRequested) {
+      gameState.endRequested = false
       this._endGame()
+      return
+    }
+
+    // Timer expired — show continue prompt unless already in survival mode
+    if (remaining <= 0 && !gameState.continueMode) {
+      gameState.paused = true
+      gameState.phase = 'continue'
+      this.audio.stopMusic()
     }
   }
 
@@ -357,6 +414,7 @@ export class GameScene extends Phaser.Scene {
     const { vx, vy } = this.joystick.getVelocity(speed)
     this.player.x = Phaser.Math.Clamp(this.player.x + vx * dt, this.player.radius, this.W - this.player.radius)
     this.player.y = Phaser.Math.Clamp(this.player.y + vy * dt, this.player.radius, this.H - this.player.radius)
+    if (Math.abs(vx) > 10) this.playerFacingLeft = vx < 0
   }
 
   _updateTeammates(dt) {
@@ -458,25 +516,43 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  _pickEnemyType(pool) {
+    let typeKey = pool[Math.floor(Math.random() * pool.length)]
+    const def = ENEMY_TYPES[typeKey]
+    if (def && def.isRare && Math.random() < 0.8) {
+      const commonPool = pool.filter(k => !ENEMY_TYPES[k]?.isRare)
+      if (commonPool.length > 0) {
+        typeKey = commonPool[Math.floor(Math.random() * commonPool.length)]
+      }
+    }
+    return typeKey
+  }
+
   _spawnEnemy() {
     const cfg = this.currentLevelConfig
     if (this.enemies.length >= cfg.maxEnemies) return
 
-    const typeKey = cfg.enemyPool[Math.floor(Math.random() * cfg.enemyPool.length)]
+    const typeKey = this._pickEnemyType(cfg.enemyPool)
     const def = ENEMY_TYPES[typeKey]
     if (!def) return
 
-    const side = Math.floor(Math.random() * 4)
-    let x, y
-    const margin = 10
-    if (side === 0) { x = Math.random() * this.W; y = -def.h }
-    else if (side === 1) { x = this.W + def.w; y = Math.random() * this.H }
-    else if (side === 2) { x = Math.random() * this.W; y = this.H + def.h }
-    else { x = -def.w; y = Math.random() * this.H }
+    if (def.isSwarm) { this._spawnNotificationSwarm(); return }
+    if (def.isLinked) { this._spawnLinkedPair(typeKey, def); return }
 
+    this._spawnSingleEnemy(typeKey, def)
+  }
+
+  _edgeSpawnPos(def) {
+    const side = Math.floor(Math.random() * 4)
+    if (side === 0) return { x: Math.random() * this.W, y: -def.h }
+    if (side === 1) return { x: this.W + def.w, y: Math.random() * this.H }
+    if (side === 2) return { x: Math.random() * this.W, y: this.H + def.h }
+    return { x: -def.w, y: Math.random() * this.H }
+  }
+
+  _makeEnemy(typeKey, def, x, y, extra = {}) {
     const gfx = this.add.graphics()
     gfx.setDepth(5)
-
     const textStyle = {
       fontFamily: 'Courier New',
       fontSize: Math.min(def.w * 0.18, 13) + 'px',
@@ -485,27 +561,191 @@ export class GameScene extends Phaser.Scene {
       wordWrap: { width: def.w - 10 },
     }
     const label = this.add.text(x, y, def.label, textStyle).setOrigin(0.5).setDepth(6)
-
     const enemy = {
-      key: typeKey,
-      x, y,
+      key: typeKey, x, y,
       w: def.w, h: def.h,
-      hp: def.hp,
-      maxHp: def.hp,
-      speed: def.speed,
-      score: def.score,
+      hp: def.hp, maxHp: def.hp,
+      speed: def.speed, score: def.score,
       gfx, label,
       isBoss: !!def.isBoss,
       hitFlash: 0,
+      ...extra,
     }
     this._drawEnemy(enemy)
+    return enemy
+  }
+
+  _spawnSingleEnemy(typeKey, def) {
+    const def_ = def || ENEMY_TYPES[typeKey]
+    let x, y
+    if (def_.isErratic) {
+      // Scope change spawns at a random interior point
+      const margin = 80
+      x = margin + Math.random() * (this.W - margin * 2)
+      y = margin + Math.random() * (this.H - margin * 2)
+    } else {
+      const pos = this._edgeSpawnPos(def_)
+      x = pos.x; y = pos.y
+    }
+    const extra = def_.isErratic ? { moveAngle: Math.random() * Math.PI * 2, moveTimer: 0 } : {}
+    const enemy = this._makeEnemy(typeKey, def_, x, y, extra)
     this.enemies.push(enemy)
+  }
+
+  _spawnNotificationSwarm() {
+    this.audio.sfxSlackNotification()
+    const def = ENEMY_TYPES.notificationSpam
+    const count = 5 + Math.floor(Math.random() * 3)
+    for (let i = 0; i < count; i++) {
+      if (this.enemies.length >= this.currentLevelConfig.maxEnemies) break
+      const angle = (i / count) * Math.PI * 2
+      const ex = this.W / 2 + Math.cos(angle) * (this.W * 0.6)
+      const ey = this.H / 2 + Math.sin(angle) * (this.H * 0.6)
+      const enemy = this._makeEnemy('notificationSpam', def, ex, ey)
+      this.enemies.push(enemy)
+    }
+  }
+
+  _spawnLinkedPair(typeKey, def) {
+    if (this.enemies.length + 2 > this.currentLevelConfig.maxEnemies) return
+    const posA = this._edgeSpawnPos(def)
+    // Spawn partner offset from A
+    const posB = {
+      x: Phaser.Math.Clamp(posA.x + (Math.random() > 0.5 ? 160 : -160), -def.w, this.W + def.w),
+      y: Phaser.Math.Clamp(posA.y + (Math.random() > 0.5 ? 100 : -100), -def.h, this.H + def.h),
+    }
+    const a = this._makeEnemy(typeKey, def, posA.x, posA.y)
+    const b = this._makeEnemy(typeKey, def, posB.x, posB.y)
+    a.linkedTo = b
+    b.linkedTo = a
+    this.enemies.push(a, b)
   }
 
   _drawEnemy(e) {
     const g = e.gfx
     g.clear()
     const isFlashing = e.hitFlash > 0
+
+    if (e.key === 'notificationSpam') {
+      g.fillStyle(isFlashing ? 0xffffff : 0xff6600, 1)
+      g.fillCircle(e.x, e.y, e.w / 2)
+      g.lineStyle(2, 0xff9944, 1)
+      g.strokeCircle(e.x, e.y, e.w / 2)
+      return
+    }
+
+    if (e.key === 'scopeChange') {
+      const fill = isFlashing ? 0xffffff : 0xff4400
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(3, 0xff8800, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      // Warning stripes
+      if (!isFlashing) {
+        g.fillStyle(0xff8800, 0.3)
+        for (let i = 0; i < 3; i++) {
+          const sx = e.x - e.w / 2 + (i * e.w / 3)
+          g.fillRect(sx, e.y - e.h / 2, e.w / 6, e.h)
+        }
+      }
+      return
+    }
+
+    if (e.key === 'legacySpreadsheet' || e.key === 'todoFrom2014') {
+      const isTodo = e.key === 'todoFrom2014'
+      const fillColor  = isTodo ? 0x3a2e0a : 0x1a4a1a
+      const accentColor = isTodo ? 0xcc9922 : 0x44aa44
+      const fill = isFlashing ? 0xffffff : fillColor
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, accentColor, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.lineStyle(1, accentColor, 0.4)
+        for (let row = 1; row < 3; row++) {
+          const ly = e.y - e.h / 2 + (row * e.h / 3)
+          g.lineBetween(e.x - e.w / 2 + 4, ly, e.x + e.w / 2 - 4, ly)
+        }
+        for (let col = 1; col < 4; col++) {
+          const lx = e.x - e.w / 2 + (col * e.w / 4)
+          g.lineBetween(lx, e.y - e.h / 2 + 4, lx, e.y + e.h / 2 - 4)
+        }
+      }
+      const barW = e.w - 8
+      const barH = 5
+      const bx = e.x - barW / 2
+      const by = e.y + e.h / 2 + 4
+      const pct = e.hp / e.maxHp
+      g.fillStyle(0x333333, 1)
+      g.fillRect(bx, by, barW, barH)
+      g.fillStyle(accentColor, 1)
+      g.fillRect(bx, by, barW * pct, barH)
+      return
+    }
+
+    if (e.key === 'githubOutage') {
+      const fill = isFlashing ? 0xffffff : 0x3a0a0a
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0xcc2222, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.lineStyle(1, 0xcc2222, 0.35)
+        const hw = e.w / 2, hh = e.h / 2
+        g.lineBetween(e.x - hw + 6, e.y - hh + 6, e.x + hw - 6, e.y + hh - 6)
+        g.lineBetween(e.x + hw - 6, e.y - hh + 6, e.x - hw + 6, e.y + hh - 6)
+      }
+      return
+    }
+
+    if (e.key === 'llmFees') {
+      const fill = isFlashing ? 0xffffff : 0x3a2e00
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0xffcc00, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.fillStyle(0xffcc00, 0.18)
+        const cols = 3, rows = 2
+        const cw = e.w / cols, ch = e.h / rows
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            g.fillRect(e.x - e.w / 2 + c * cw + 2, e.y - e.h / 2 + r * ch + 2, cw - 4, ch - 4)
+          }
+        }
+      }
+      return
+    }
+
+    if (e.key === 'alwaysDns') {
+      const fill = isFlashing ? 0xffffff : 0x0a2a2a
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0x00aaaa, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.lineStyle(1, 0x00aaaa, 0.4)
+        g.lineBetween(e.x - e.w / 2 + 4, e.y, e.x + e.w / 2 - 4, e.y)
+        g.fillStyle(0x00aaaa, 0.5)
+        g.fillCircle(e.x, e.y, 5)
+      }
+      return
+    }
+
+    if (e.key === 'doubleBooked') {
+      const fill = isFlashing ? 0xffffff : 0x1a3a5c
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
+      g.lineStyle(2, 0x4488ff, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
+      // Calendar header bar
+      if (!isFlashing) {
+        g.fillStyle(0x4488ff, 0.5)
+        g.fillRect(e.x - e.w / 2 + 2, e.y - e.h / 2 + 2, e.w - 4, e.h * 0.28)
+      }
+      return
+    }
+
     const fillColor = isFlashing ? 0xffffff : (e.isBoss ? COLORS.boss : COLORS.enemyFill)
     const strokeColor = e.isBoss ? COLORS.bossStroke : COLORS.enemyStroke
     g.fillStyle(fillColor, 1)
@@ -513,7 +753,6 @@ export class GameScene extends Phaser.Scene {
     g.lineStyle(e.isBoss ? 3 : 2, strokeColor, 1)
     g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
 
-    // Health bar for boss
     if (e.isBoss && e.maxHp > 10) {
       const barW = e.w - 10
       const barH = 6
@@ -530,12 +769,36 @@ export class GameScene extends Phaser.Scene {
   _moveEnemies(dt) {
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i]
-      const angle = Phaser.Math.Angle.Between(e.x, e.y, this.player.x, this.player.y)
+
+      let angle
+      if (e.key === 'scopeChange') {
+        // Erratic: change direction every 0.4-0.8s, bias toward player
+        e.moveTimer = (e.moveTimer || 0) + dt
+        if (e.moveTimer > 0.4 + Math.random() * 0.4) {
+          e.moveTimer = 0
+          const toPlayer = Phaser.Math.Angle.Between(e.x, e.y, this.player.x, this.player.y)
+          // 60% chance to lunge toward player, otherwise random
+          e.moveAngle = Math.random() < 0.6
+            ? toPlayer + (Math.random() - 0.5) * 1.2
+            : Math.random() * Math.PI * 2
+        }
+        angle = e.moveAngle || 0
+      } else {
+        angle = Phaser.Math.Angle.Between(e.x, e.y, this.player.x, this.player.y)
+      }
+
       e.x += Math.cos(angle) * e.speed * dt
       e.y += Math.sin(angle) * e.speed * dt
       e.label.x = e.x
       e.label.y = e.y
       if (e.hitFlash > 0) e.hitFlash -= dt
+
+      if (e.key === 'alwaysDns') {
+        const blink = 0.55 + 0.45 * Math.sin(this.elapsedTime * Math.PI * 2)
+        e.gfx.setAlpha(blink)
+        e.label.setAlpha(blink)
+      }
+
       this._drawEnemy(e)
     }
   }
@@ -551,23 +814,58 @@ export class GameScene extends Phaser.Scene {
     const gfx = this.add.graphics()
     gfx.setDepth(7)
 
-    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, angle: 0, life: 12, collected: false }
+    const txt = this.add.text(x, y, def.label, {
+      fontSize: '20px',
+      align: 'center',
+    }).setOrigin(0.5).setDepth(8)
+
+    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, txt, angle: 0, life: 12, collected: false }
     this._drawPowerup(pu)
     this.powerups.push(pu)
+    this.audio.sfxPowerupSpawn()
+    this._spawnRipple(x, y, def.color)
+  }
+
+  _spawnRipple(x, y, color) {
+    for (let i = 0; i < 3; i++) {
+      const gfx = this.add.graphics()
+      gfx.setDepth(6)
+      this.ripples.push({ x, y, color, gfx, radius: 0, maxRadius: 60 + i * 20, alpha: 0.7, delay: i * 0.12, age: 0 })
+    }
+  }
+
+  _updateRipples(dt) {
+    for (let i = this.ripples.length - 1; i >= 0; i--) {
+      const r = this.ripples[i]
+      r.age += dt
+      if (r.age < r.delay) continue
+      const t = (r.age - r.delay) / 0.7
+      r.radius = r.maxRadius * Math.min(t, 1)
+      r.alpha = 0.7 * (1 - Math.min(t, 1))
+      r.gfx.clear()
+      if (r.alpha > 0.01) {
+        r.gfx.lineStyle(2, r.color, r.alpha)
+        r.gfx.strokeCircle(r.x, r.y, r.radius)
+      }
+      if (t >= 1) {
+        r.gfx.destroy()
+        this.ripples.splice(i, 1)
+      }
+    }
   }
 
   _drawPowerup(pu) {
     const g = pu.gfx
     g.clear()
     const py = pu.y + (pu.bobOffset || 0)
-    // Glow
-    g.fillStyle(pu.color, 0.2)
-    g.fillCircle(pu.x, py, pu.size + 8)
-    // Diamond shape
-    g.fillStyle(pu.color, 1)
-    const s = pu.size
-    g.fillTriangle(pu.x, py - s, pu.x + s, py, pu.x, py + s)
-    g.fillTriangle(pu.x, py - s, pu.x - s, py, pu.x, py + s)
+    // Outer soft glow
+    g.fillStyle(pu.color, 0.15)
+    g.fillCircle(pu.x, py, pu.size + 14)
+    // Inner lit background circle
+    g.fillStyle(0xffffff, 0.18)
+    g.fillCircle(pu.x, py, pu.size + 4)
+    // Sync emoji text
+    if (pu.txt) pu.txt.setPosition(pu.x, py)
   }
 
   _updatePowerups(dt) {
@@ -579,6 +877,7 @@ export class GameScene extends Phaser.Scene {
       this._drawPowerup(pu)
       if (pu.life <= 0 || pu.collected) {
         pu.gfx.destroy()
+        if (pu.txt) pu.txt.destroy()
         this.powerups.splice(i, 1)
       }
     }
@@ -619,6 +918,8 @@ export class GameScene extends Phaser.Scene {
         this.timeSinceLastHit = 0
         this.streakChecked2x = false
         this.streakChecked3x = false
+        this.streakChecked4x = false
+        this.streakChecked5x = false
         gameState.streakMultiplier = 1
         this.audio.sfxHit()
 
@@ -653,32 +954,77 @@ export class GameScene extends Phaser.Scene {
   _collectPowerup(pu) {
     this.audio.sfxPowerup()
 
+    const VALUE_NAMES = {
+      innovation: 'Innovation',
+      kindness: 'Kindness',
+      teammate: 'Teamwork',
+      integrity: 'Integrity',
+      excellence: 'Excellence',
+    }
+    const valueName = VALUE_NAMES[pu.key]
+    if (valueName) this._showValueName(pu.x, pu.y, valueName, POWERUP_TYPES[pu.key].color)
+
+    const countKey = pu.key === 'teammate' ? 'teamwork' : pu.key
+    if (gameState.valuesCollected[countKey] !== undefined) {
+      gameState.valuesCollected[countKey]++
+    }
+
     switch (pu.key) {
       case 'innovation':
-        gameState.weaponTier = Math.min(3, gameState.weaponTier + 1)
-        this._showFloatingText(pu.x, pu.y, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
+        if (gameState.weaponTier < 3) {
+          gameState.weaponTier++
+          this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
+        } else {
+          this._triggerOverclock()
+          this._showFloatingText(pu.x, pu.y + 36, '💡 Overclock!', COLORS.innovation)
+        }
         break
       case 'kindness':
         gameState.health = Math.min(100, gameState.health + 25)
-        this._showFloatingText(pu.x, pu.y, '+25 Capacity!', COLORS.kindness)
+        this._showFloatingText(pu.x, pu.y + 36, '+25 Capacity!', COLORS.kindness)
         break
       case 'teammate':
-        if (gameState.teammateCount < 3) {
+        if (gameState.teammateCount < 4) {
           gameState.teammateCount++
           this.teammates.push({ x: this.player.x, y: this.player.y, gfx: this.add.graphics(), fireTimer: 0 })
           this.teammates[this.teammates.length - 1].gfx.setDepth(9)
-          this._showFloatingText(pu.x, pu.y, 'Teammate Joined!', COLORS.teamwork)
+          this._showFloatingText(pu.x, pu.y + 36, 'Teammate Joined!', COLORS.teamwork)
         }
         break
       case 'integrity':
         gameState.hasIntegrity = true
-        this._showFloatingText(pu.x, pu.y, 'Integrity Shield!', COLORS.integrity)
+        this._showFloatingText(pu.x, pu.y + 36, 'Integrity Shield!', COLORS.integrity)
         break
       case 'excellence':
-        gameState.streakMultiplier = Math.min(3, gameState.streakMultiplier + 1)
-        this._showFloatingText(pu.x, pu.y, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
+        gameState.streakMultiplier = Math.min(5, gameState.streakMultiplier + 1)
+        this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
         break
     }
+  }
+
+  _showValueName(x, y, name, color) {
+    const colorHex = '#' + color.toString(16).padStart(6, '0')
+    const fontSize = Math.min(this.W * 0.055, 28)
+    const txt = this.add.text(x, y, name.toUpperCase(), {
+      fontFamily: 'Courier New',
+      fontSize: fontSize + 'px',
+      fontStyle: 'bold',
+      color: colorHex,
+      stroke: '#000000',
+      strokeThickness: 5,
+      align: 'center',
+    }).setOrigin(0.5).setDepth(60)
+
+    this.tweens.add({
+      targets: txt,
+      y: y - 80,
+      alpha: 0,
+      scaleX: 1.4,
+      scaleY: 1.4,
+      duration: 1600,
+      ease: 'Power2',
+      onComplete: () => txt.destroy(),
+    })
   }
 
   _weaponTierName(tier) {
@@ -703,9 +1049,37 @@ export class GameScene extends Phaser.Scene {
     e.gfx.destroy()
     e.label.destroy()
 
-    // Update boss state
+    // Free linked partner — it becomes a solo faster enemy
+    if (e.linkedTo) {
+      e.linkedTo.linkedTo = null
+      e.linkedTo.speed = Math.min(e.linkedTo.speed * 1.5, 140)
+      this._showFloatingText(e.linkedTo.x, e.linkedTo.y - 20, 'Unchained!', 0x4488ff)
+    }
+
     if (e.isBoss) {
       gameState.bossActive = false
+      this._showBossDefeatedBanner()
+      this.time.delayedCall(2200, () => this._endGame(true))
+    }
+  }
+
+  _drawChains() {
+    this.chainGfx.clear()
+    for (const e of this.enemies) {
+      if (e.linkedTo && e.linkedTo.x > e.x) {
+        // Only draw once per pair (the one with smaller x draws it)
+        this.chainGfx.lineStyle(3, 0x4488ff, 0.7)
+        this.chainGfx.lineBetween(e.x, e.y, e.linkedTo.x, e.linkedTo.y)
+        // Chain links (dots along the line)
+        const steps = 5
+        for (let i = 1; i < steps; i++) {
+          const t = i / steps
+          const cx = e.x + (e.linkedTo.x - e.x) * t
+          const cy = e.y + (e.linkedTo.y - e.y) * t
+          this.chainGfx.fillStyle(0x4488ff, 0.9)
+          this.chainGfx.fillCircle(cx, cy, 4)
+        }
+      }
     }
   }
 
@@ -772,9 +1146,27 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.timeSinceLastHit >= TIMING.excellenceStreakTime * 2 && !this.streakChecked3x) {
       this.streakChecked3x = true
-      gameState.streakMultiplier = 3
+      gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 3)
       gameState.bestStreak = Math.max(gameState.bestStreak, 3)
     }
+    if (this.timeSinceLastHit >= 45 && !this.streakChecked4x) {
+      this.streakChecked4x = true
+      gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 4)
+      gameState.bestStreak = Math.max(gameState.bestStreak, 4)
+      this._showFloatingText(this.player.x, this.player.y - 50, '4× Excellence!', COLORS.excellence)
+    }
+    if (this.timeSinceLastHit >= 60 && !this.streakChecked5x) {
+      this.streakChecked5x = true
+      gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 5)
+      gameState.bestStreak = Math.max(gameState.bestStreak, 5)
+      this._showFloatingText(this.player.x, this.player.y - 50, '5× Excellence! UNSTOPPABLE!', COLORS.excellence)
+    }
+  }
+
+  _triggerOverclock() {
+    this.overclockTimer = 4
+    this.overclockActive = true
+    this.audio.sfxLevelUp()
   }
 
   _spawnBoss() {
@@ -836,14 +1228,45 @@ export class GameScene extends Phaser.Scene {
     this.audio.sfxDisruption()
   }
 
-  _endGame() {
+  _showBossDefeatedBanner() {
+    this.audio.sfxVictory()
+    this._spawnConfetti(this.W / 2, this.H / 2, 60)
+
+    const bg = this.add.graphics()
+    bg.fillStyle(0xffd700, 0.85)
+    bg.fillRect(0, this.H / 2 - 65, this.W, 130)
+    bg.setDepth(92)
+
+    const txt = this.add.text(this.W / 2, this.H / 2, '🏆 THE UNKNOWN FUTURE DEFEATED!\nMISSION ACCOMPLISHED!', {
+      fontFamily: 'Courier New',
+      fontSize: Math.min(this.W * 0.048, 20) + 'px',
+      color: '#000000',
+      align: 'center',
+      stroke: '#ffffff',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(93)
+
+    this.tweens.add({
+      targets: [bg, txt], alpha: 0, delay: 1800, duration: 400,
+      onComplete: () => { bg.destroy(); txt.destroy() },
+    })
+  }
+
+  _endGame(forceVictory = false) {
     if (!this.gameRunning) return
     this.gameRunning = false
     this.audio.stopMusic()
-    this.audio.sfxLevelUp()
 
-    // Fade out
-    this.cameras.main.fade(800, 0, 0, 0, false, (cam, progress) => {
+    const survived = forceVictory || gameState.victory || gameState.health > 0
+    gameState.victory = survived
+
+    if (survived) {
+      this.audio.sfxVictory()
+    } else {
+      this.audio.sfxLevelUp()
+    }
+
+    this.cameras.main.fade(1000, 0, 0, 0, false, (cam, progress) => {
       if (progress >= 1) {
         gameState.phase = 'gameover'
       }

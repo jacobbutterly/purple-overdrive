@@ -3,7 +3,7 @@ export const level3Config = {
   accentColor: 0xff44cc,
   spawnInterval: 1000,
   maxEnemies: 22,
-  enemyPool: ['scopeCreep', 'legacyRedTape', 'endlessMeeting', 'siloMatrix'],
+  enemyPool: ['scopeCreep', 'legacyRedTape', 'endlessMeeting', 'siloMatrix', 'scopeChange', 'notificationSpam', 'doubleBooked', 'githubOutage', 'llmFees', 'alwaysDns'],
   powerupInterval: 5000,
   powerupPool: ['innovation', 'kindness', 'teammate', 'integrity', 'excellence'],
   musicBPM: 140,
