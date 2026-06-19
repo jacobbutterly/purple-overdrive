@@ -653,32 +653,67 @@ export class GameScene extends Phaser.Scene {
   _collectPowerup(pu) {
     this.audio.sfxPowerup()
 
+    const VALUE_NAMES = {
+      innovation: 'Innovation',
+      kindness: 'Kindness',
+      teammate: 'Teamwork',
+      integrity: 'Integrity',
+      excellence: 'Excellence',
+    }
+    const valueName = VALUE_NAMES[pu.key]
+    if (valueName) this._showValueName(pu.x, pu.y, valueName, POWERUP_TYPES[pu.key].color)
+
     switch (pu.key) {
       case 'innovation':
         gameState.weaponTier = Math.min(3, gameState.weaponTier + 1)
-        this._showFloatingText(pu.x, pu.y, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
+        this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
         break
       case 'kindness':
         gameState.health = Math.min(100, gameState.health + 25)
-        this._showFloatingText(pu.x, pu.y, '+25 Capacity!', COLORS.kindness)
+        this._showFloatingText(pu.x, pu.y + 36, '+25 Capacity!', COLORS.kindness)
         break
       case 'teammate':
         if (gameState.teammateCount < 3) {
           gameState.teammateCount++
           this.teammates.push({ x: this.player.x, y: this.player.y, gfx: this.add.graphics(), fireTimer: 0 })
           this.teammates[this.teammates.length - 1].gfx.setDepth(9)
-          this._showFloatingText(pu.x, pu.y, 'Teammate Joined!', COLORS.teamwork)
+          this._showFloatingText(pu.x, pu.y + 36, 'Teammate Joined!', COLORS.teamwork)
         }
         break
       case 'integrity':
         gameState.hasIntegrity = true
-        this._showFloatingText(pu.x, pu.y, 'Integrity Shield!', COLORS.integrity)
+        this._showFloatingText(pu.x, pu.y + 36, 'Integrity Shield!', COLORS.integrity)
         break
       case 'excellence':
         gameState.streakMultiplier = Math.min(3, gameState.streakMultiplier + 1)
-        this._showFloatingText(pu.x, pu.y, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
+        this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
         break
     }
+  }
+
+  _showValueName(x, y, name, color) {
+    const colorHex = '#' + color.toString(16).padStart(6, '0')
+    const fontSize = Math.min(this.W * 0.055, 28)
+    const txt = this.add.text(x, y, name.toUpperCase(), {
+      fontFamily: 'Courier New',
+      fontSize: fontSize + 'px',
+      fontStyle: 'bold',
+      color: colorHex,
+      stroke: '#000000',
+      strokeThickness: 5,
+      align: 'center',
+    }).setOrigin(0.5).setDepth(60)
+
+    this.tweens.add({
+      targets: txt,
+      y: y - 80,
+      alpha: 0,
+      scaleX: 1.4,
+      scaleY: 1.4,
+      duration: 1600,
+      ease: 'Power2',
+      onComplete: () => txt.destroy(),
+    })
   }
 
   _weaponTierName(tier) {
