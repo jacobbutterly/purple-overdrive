@@ -58,16 +58,6 @@
         </div>
       </div>
 
-      <div class="start-values">
-        <div class="value-chip">⚡ Innovation</div>
-        <div class="value-chip">🏆 Excellence</div>
-        <div class="value-chip">👥 Teamwork</div>
-        <div class="value-chip">🛡 Integrity</div>
-        <div class="value-chip">💚 Kindness</div>
-        <div class="value-chip">🔥 Passion</div>
-        <div class="value-chip">🎉 Fun</div>
-      </div>
-
       <button
         class="start-btn"
         :class="{ pulse: !tapped }"

@@ -1,7 +1,7 @@
 <template>
   <div class="continue-overlay">
     <div class="continue-panel">
-      <div class="continue-icon">⚔️</div>
+      <div class="continue-icon">⏰</div>
       <h2 class="continue-title">Time's Up!</h2>
       <p class="continue-body">
         The clock has run out — but the battle isn't over.<br>
@@ -13,7 +13,7 @@
       </div>
 
       <div class="continue-actions">
-        <button class="continue-fight-btn" @click="keepFighting">
+        <button class="continue-fight-btn grow-pulse" @click="keepFighting">
           ⚡ Keep Fighting
         </button>
         <button class="continue-end-btn" @click="endMission">
@@ -144,8 +144,16 @@ function endMission() {
   box-shadow: 0 0 20px #9B30FF66;
 }
 
-.continue-fight-btn:hover { box-shadow: 0 0 32px #9B30FFaa; }
-.continue-fight-btn:active { transform: scale(0.96); }
+.grow-pulse {
+  animation: grow-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes grow-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 20px #9B30FF66; }
+  50%       { transform: scale(1.07); box-shadow: 0 0 40px #9B30FFcc; }
+}
+
+.continue-fight-btn:active { transform: scale(0.96) !important; animation: none; }
 
 .continue-end-btn {
   background: transparent;

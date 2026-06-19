@@ -22,6 +22,13 @@ export const gameState = reactive({
   paused: false,
   continueMode: false,
   endRequested: false,
+  valuesCollected: {
+    innovation: 0,
+    kindness: 0,
+    teamwork: 0,
+    integrity: 0,
+    excellence: 0,
+  },
 })
 
 export function resetGameState() {
@@ -45,4 +52,11 @@ export function resetGameState() {
   gameState.paused = false
   gameState.continueMode = false
   gameState.endRequested = false
+  gameState.valuesCollected = {
+    innovation: 0,
+    kindness: 0,
+    teamwork: 0,
+    integrity: 0,
+    excellence: 0,
+  }
 }

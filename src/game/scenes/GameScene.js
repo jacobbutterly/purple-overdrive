@@ -152,8 +152,9 @@ export class GameScene extends Phaser.Scene {
       g.strokeCircle(this.player.x, this.player.y, this.player.radius + 18)
     }
 
-    // Sync emoji position
+    // Sync emoji position and facing direction
     this.player.emoji.setPosition(this.player.x, this.player.y)
+    this.player.emoji.setFlipX(!!this.playerFacingLeft)
   }
 
   _setupGroups() {
@@ -413,6 +414,7 @@ export class GameScene extends Phaser.Scene {
     const { vx, vy } = this.joystick.getVelocity(speed)
     this.player.x = Phaser.Math.Clamp(this.player.x + vx * dt, this.player.radius, this.W - this.player.radius)
     this.player.y = Phaser.Math.Clamp(this.player.y + vy * dt, this.player.radius, this.H - this.player.radius)
+    if (Math.abs(vx) > 10) this.playerFacingLeft = vx < 0
   }
 
   _updateTeammates(dt) {
@@ -955,6 +957,11 @@ export class GameScene extends Phaser.Scene {
     }
     const valueName = VALUE_NAMES[pu.key]
     if (valueName) this._showValueName(pu.x, pu.y, valueName, POWERUP_TYPES[pu.key].color)
+
+    const countKey = pu.key === 'teammate' ? 'teamwork' : pu.key
+    if (gameState.valuesCollected[countKey] !== undefined) {
+      gameState.valuesCollected[countKey]++
+    }
 
     switch (pu.key) {
       case 'innovation':

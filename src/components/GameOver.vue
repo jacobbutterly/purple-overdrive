@@ -29,25 +29,13 @@
           <span class="stat-label">Score</span>
           <span class="stat-value">{{ formattedScore }}</span>
         </div>
-        <div class="stat-row">
-          <span class="stat-icon">🏆</span>
-          <span class="stat-label">Level Reached</span>
-          <span class="stat-value">{{ levelLabel }}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-icon">🔥</span>
-          <span class="stat-label">Best Streak</span>
-          <span class="stat-value">{{ gameState.bestStreak }}×</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-icon">👥</span>
-          <span class="stat-label">Team Size</span>
-          <span class="stat-value">{{ gameState.teammateCount + 1 }} {{ gameState.teammateCount === 0 ? '(Solo)' : 'allies' }}</span>
-        </div>
-        <div class="stat-row">
-          <span class="stat-icon">🔫</span>
-          <span class="stat-label">Weapon Tier</span>
-          <span class="stat-value">{{ weaponTierName }}</span>
+        <div class="stats-divider">Values Collected</div>
+        <div class="stat-row" v-for="v in valueStats" :key="v.key">
+          <span class="stat-icon">{{ v.icon }}</span>
+          <span class="stat-label">{{ v.label }}</span>
+          <span class="stat-value" :class="{ 'stat-zero': v.count === 0 }">
+            {{ v.count }}×
+          </span>
         </div>
       </div>
 
@@ -76,10 +64,13 @@ const copied = ref(false)
 
 const formattedScore = computed(() => gameState.score.toLocaleString())
 
-const levelLabel = computed(() => {
-  if (gameState.victory) return '3 ✓'
-  return `${gameState.level}`
-})
+const valueStats = computed(() => [
+  { key: 'innovation', icon: '⚡', label: 'Innovation', count: gameState.valuesCollected.innovation },
+  { key: 'excellence', icon: '🏆', label: 'Excellence',  count: gameState.valuesCollected.excellence },
+  { key: 'teamwork',   icon: '👥', label: 'Teamwork',    count: gameState.valuesCollected.teamwork   },
+  { key: 'integrity',  icon: '🛡', label: 'Integrity',   count: gameState.valuesCollected.integrity  },
+  { key: 'kindness',   icon: '💚', label: 'Kindness',    count: gameState.valuesCollected.kindness   },
+])
 
 const weaponTierName = computed(() => {
   const names = ['Basic Shot', 'Prompt Laser', 'LLM Cyclone', 'Diffusion Shield']
@@ -90,10 +81,7 @@ function buildScorecard() {
   const name = gameState.playerName || 'Agent'
   const outcome = gameState.victory ? '✅ MISSION ACCOMPLISHED' : '❌ Game Over'
   const score = gameState.score.toLocaleString()
-  const level = levelLabel.value
-  const streak = gameState.bestStreak
-  const team = gameState.teammateCount + 1
-  const weapon = weaponTierName.value
+  const vc = gameState.valuesCollected
 
   return [
     '👾 Purple Overdrive: A-Team Surge',
@@ -101,10 +89,12 @@ function buildScorecard() {
     outcome,
     '─────────────────────────────────',
     `🎯 Score:        ${score}`,
-    `🏆 Level:        ${level}`,
-    `🔥 Best Streak:  ${streak}×`,
-    `👥 Team Size:    ${team} ${team === 1 ? 'solo' : 'strong'}`,
-    `🔫 Weapon:       ${weapon}`,
+    '── Values Collected ──────────────',
+    `⚡ Innovation:   ${vc.innovation}×`,
+    `🏆 Excellence:   ${vc.excellence}×`,
+    `👥 Teamwork:     ${vc.teamwork}×`,
+    `🛡 Integrity:    ${vc.integrity}×`,
+    `💚 Kindness:     ${vc.kindness}×`,
     '─────────────────────────────────',
     'Can you beat this? 🚀 #PurpleOverdrive',
   ].join('\n')
@@ -243,6 +233,18 @@ function copyScorecard() {
 }
 
 .stat-row:last-child { border-bottom: none; }
+
+.stats-divider {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: #666;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 6px 0 2px;
+}
+
+.stat-zero { color: #555; }
 
 .stat-icon { font-size: 16px; width: 22px; }
 
