@@ -58,12 +58,12 @@ export const ENEMY_TYPES = {
   // Custom obstacles
   legacySpreadsheet: { label: 'Legacy Spreadsheet V3_FINAL_FINAL', level: 1, w: 120, h: 72,  hp: 20,  speed: 28,  score: 60,  isLegacy: true, isRare: true },
   todoFrom2014:      { label: '@TODO from 2014',                   level: 1, w: 110, h: 68,  hp: 16,  speed: 22,  score: 50,  isLegacy: true, isRare: true },
-  githubOutage:      { label: 'GitHub\nOutage',                    level: 2, w: 140, h: 80,  hp: 18,  speed: 35,  score: 55  },
-  llmFees:           { label: 'Increased\nLLM Fees 💸',           level: 2, w: 125, h: 72,  hp: 8,   speed: 60,  score: 45  },
-  alwaysDns:         { label: "It's Always\nDNS",                 level: 1, w: 110, h: 65,  hp: 5,   speed: 80,  score: 35  },
-  scopeChange:       { label: '4:55 PM\nScope\nChange',               level: 2, w: 105, h: 62,  hp: 3,   speed: 160, score: 40,  isErratic: true },
-  notificationSpam:  { label: '🔔',                                   level: 2, w: 32,  h: 32,  hp: 1,   speed: 230, score: 8,   isSwarm: true },
-  doubleBooked:      { label: '📅 Double\nBooked',                    level: 2, w: 88,  h: 58,  hp: 6,   speed: 42,  score: 80,  isLinked: true },
+  githubOutage:      { label: 'GitHub\nOutage',                    level: 2, w: 140, h: 80,  hp: 18,  speed: 35,  score: 55,  isRare: true },
+  llmFees:           { label: 'Increased\nLLM Fees 💸',           level: 2, w: 125, h: 72,  hp: 8,   speed: 60,  score: 45,  isRare: true },
+  alwaysDns:         { label: "It's Always\nDNS",                 level: 1, w: 110, h: 65,  hp: 5,   speed: 80,  score: 35,  isRare: true },
+  scopeChange:       { label: '4:55 PM\nScope\nChange',               level: 2, w: 105, h: 62,  hp: 3,   speed: 160, score: 40,  isErratic: true, isRare: true },
+  notificationSpam:  { label: '🔔',                                   level: 2, w: 32,  h: 32,  hp: 1,   speed: 230, score: 8,   isSwarm: true,  isRare: true },
+  doubleBooked:      { label: '📅 Double\nBooked',                    level: 2, w: 88,  h: 58,  hp: 6,   speed: 42,  score: 80,  isLinked: true, isRare: true },
 }
 
 export const POWERUP_TYPES = {

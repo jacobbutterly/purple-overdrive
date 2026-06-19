@@ -160,10 +160,9 @@ export class AudioSystem {
   }
 
   sfxSlackNotification() {
-    if (!this.ctx) return
-    const now = this.ctx.currentTime
-    this._playOsc(now, 880, 0.12, 0.08, 'sine', this.sfxGain)
-    this._playOsc(now + 0.1, 1100, 0.1, 0.08, 'sine', this.sfxGain)
+    const audio = new Audio('/assets/audio/slack.mp3')
+    audio.volume = 0.6
+    audio.play().catch(() => {})
   }
 
   sfxPassion() {
