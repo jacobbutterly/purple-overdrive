@@ -1,6 +1,6 @@
 <template>
   <div class="gameover-screen" :class="{ victory: gameState.victory }">
-    <div class="gameover-content">
+    <div class="gameover-content" ref="contentRef">
       <div class="gameover-logo">{{ gameState.victory ? '🏆' : '👾' }}</div>
 
       <div v-if="gameState.playerName" class="player-greeting">
@@ -43,6 +43,9 @@
         <button class="copy-btn" :class="{ copied }" @click="copyScorecard">
           {{ copied ? '✓ Copied!' : '📋 Copy Score Card' }}
         </button>
+        <button class="download-btn" :class="{ downloading }" @click="downloadImage" :disabled="downloading">
+          {{ downloading ? '⏳ Saving...' : '📸 Download Image' }}
+        </button>
         <button class="replay-btn" @click="$emit('restart')">
           ▶ Play Again
         </button>
@@ -56,11 +59,14 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import html2canvas from 'html2canvas'
 import { gameState } from '../gameState.js'
 
 defineEmits(['restart'])
 
+const contentRef = ref(null)
 const copied = ref(false)
+const downloading = ref(false)
 
 const formattedScore = computed(() => gameState.score.toLocaleString())
 
@@ -98,6 +104,27 @@ function buildScorecard() {
     '─────────────────────────────────',
     'Can you beat this? 🚀 #PurpleOverdrive',
   ].join('\n')
+}
+
+async function downloadImage() {
+  if (!contentRef.value || downloading.value) return
+  downloading.value = true
+  try {
+    const canvas = await html2canvas(contentRef.value, {
+      backgroundColor: gameState.victory ? '#0d2000' : '#0d0020',
+      scale: 2,
+      useCORS: true,
+      logging: false,
+    })
+    const link = document.createElement('a')
+    const name = (gameState.playerName || 'Agent').replace(/\s+/g, '_')
+    const outcome = gameState.victory ? 'mission_accomplished' : 'game_over'
+    link.download = `purple_overdrive_${name}_${outcome}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  } finally {
+    downloading.value = false
+  }
 }
 
 function copyScorecard() {
@@ -268,7 +295,7 @@ function copyScorecard() {
   margin-bottom: 16px;
 }
 
-.copy-btn, .replay-btn {
+.copy-btn, .download-btn, .replay-btn {
   font-family: 'Courier New', monospace;
   font-size: clamp(13px, 3.5vw, 16px);
   padding: 14px 24px;
@@ -279,6 +306,16 @@ function copyScorecard() {
   font-weight: bold;
   transition: transform 0.15s, box-shadow 0.15s;
 }
+
+.download-btn {
+  background: transparent;
+  color: #44ccff;
+  border: 2px solid #44ccff55;
+}
+
+.download-btn:hover { border-color: #44ccff; }
+.download-btn:disabled { opacity: 0.6; cursor: default; }
+.download-btn.downloading { color: #888; border-color: #44444466; }
 
 .copy-btn {
   background: #9B30FF;
