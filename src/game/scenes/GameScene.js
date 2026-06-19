@@ -814,7 +814,12 @@ export class GameScene extends Phaser.Scene {
     const gfx = this.add.graphics()
     gfx.setDepth(7)
 
-    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, angle: 0, life: 12, collected: false }
+    const txt = this.add.text(x, y, def.label, {
+      fontSize: '20px',
+      align: 'center',
+    }).setOrigin(0.5).setDepth(8)
+
+    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, txt, angle: 0, life: 12, collected: false }
     this._drawPowerup(pu)
     this.powerups.push(pu)
     this.audio.sfxPowerupSpawn()
@@ -854,13 +859,15 @@ export class GameScene extends Phaser.Scene {
     g.clear()
     const py = pu.y + (pu.bobOffset || 0)
     // Glow
-    g.fillStyle(pu.color, 0.2)
-    g.fillCircle(pu.x, py, pu.size + 8)
-    // Diamond shape
-    g.fillStyle(pu.color, 1)
+    g.fillStyle(pu.color, 0.25)
+    g.fillCircle(pu.x, py, pu.size + 10)
+    // Diamond shape (slightly transparent so emoji reads clearly)
+    g.fillStyle(pu.color, 0.55)
     const s = pu.size
     g.fillTriangle(pu.x, py - s, pu.x + s, py, pu.x, py + s)
     g.fillTriangle(pu.x, py - s, pu.x - s, py, pu.x, py + s)
+    // Sync emoji text
+    if (pu.txt) pu.txt.setPosition(pu.x, py)
   }
 
   _updatePowerups(dt) {
@@ -872,6 +879,7 @@ export class GameScene extends Phaser.Scene {
       this._drawPowerup(pu)
       if (pu.life <= 0 || pu.collected) {
         pu.gfx.destroy()
+        if (pu.txt) pu.txt.destroy()
         this.powerups.splice(i, 1)
       }
     }
