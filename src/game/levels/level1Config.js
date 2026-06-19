@@ -5,7 +5,7 @@ export const level1Config = {
   accentColor: 0x666666,
   spawnInterval: 2200,
   maxEnemies: 8,
-  enemyPool: ['unreadInbox', 'spreadsheet'],
+  enemyPool: ['unreadInbox', 'spreadsheet', 'legacySpreadsheet'],
   powerupInterval: 8000,
   powerupPool: ['innovation', 'kindness', 'teammate', 'excellence'],
   musicBPM: 80,

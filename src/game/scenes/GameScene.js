@@ -135,6 +135,8 @@ export class GameScene extends Phaser.Scene {
     this.projectiles = []
     this.powerups = []
     this.ripples = []
+    this.chainGfx = this.add.graphics()
+    this.chainGfx.setDepth(4)
   }
 
   _setupJoystick() {
@@ -211,6 +213,7 @@ export class GameScene extends Phaser.Scene {
     // Move powerups (float)
     this._updatePowerups(dt)
     this._updateRipples(dt)
+    this._drawChains()
 
     // Collisions
     this._checkProjectileEnemyCollisions()
@@ -468,17 +471,23 @@ export class GameScene extends Phaser.Scene {
     const def = ENEMY_TYPES[typeKey]
     if (!def) return
 
-    const side = Math.floor(Math.random() * 4)
-    let x, y
-    const margin = 10
-    if (side === 0) { x = Math.random() * this.W; y = -def.h }
-    else if (side === 1) { x = this.W + def.w; y = Math.random() * this.H }
-    else if (side === 2) { x = Math.random() * this.W; y = this.H + def.h }
-    else { x = -def.w; y = Math.random() * this.H }
+    if (def.isSwarm) { this._spawnNotificationSwarm(); return }
+    if (def.isLinked) { this._spawnLinkedPair(typeKey, def); return }
 
+    this._spawnSingleEnemy(typeKey, def)
+  }
+
+  _edgeSpawnPos(def) {
+    const side = Math.floor(Math.random() * 4)
+    if (side === 0) return { x: Math.random() * this.W, y: -def.h }
+    if (side === 1) return { x: this.W + def.w, y: Math.random() * this.H }
+    if (side === 2) return { x: Math.random() * this.W, y: this.H + def.h }
+    return { x: -def.w, y: Math.random() * this.H }
+  }
+
+  _makeEnemy(typeKey, def, x, y, extra = {}) {
     const gfx = this.add.graphics()
     gfx.setDepth(5)
-
     const textStyle = {
       fontFamily: 'Courier New',
       fontSize: Math.min(def.w * 0.18, 13) + 'px',
@@ -487,27 +496,140 @@ export class GameScene extends Phaser.Scene {
       wordWrap: { width: def.w - 10 },
     }
     const label = this.add.text(x, y, def.label, textStyle).setOrigin(0.5).setDepth(6)
-
     const enemy = {
-      key: typeKey,
-      x, y,
+      key: typeKey, x, y,
       w: def.w, h: def.h,
-      hp: def.hp,
-      maxHp: def.hp,
-      speed: def.speed,
-      score: def.score,
+      hp: def.hp, maxHp: def.hp,
+      speed: def.speed, score: def.score,
       gfx, label,
       isBoss: !!def.isBoss,
       hitFlash: 0,
+      ...extra,
     }
     this._drawEnemy(enemy)
+    return enemy
+  }
+
+  _spawnSingleEnemy(typeKey, def) {
+    const def_ = def || ENEMY_TYPES[typeKey]
+    let x, y
+    if (def_.isErratic) {
+      // Scope change spawns at a random interior point
+      const margin = 80
+      x = margin + Math.random() * (this.W - margin * 2)
+      y = margin + Math.random() * (this.H - margin * 2)
+    } else {
+      const pos = this._edgeSpawnPos(def_)
+      x = pos.x; y = pos.y
+    }
+    const extra = def_.isErratic ? { moveAngle: Math.random() * Math.PI * 2, moveTimer: 0 } : {}
+    const enemy = this._makeEnemy(typeKey, def_, x, y, extra)
     this.enemies.push(enemy)
+  }
+
+  _spawnNotificationSwarm() {
+    const def = ENEMY_TYPES.notificationSpam
+    const count = 5 + Math.floor(Math.random() * 3)
+    for (let i = 0; i < count; i++) {
+      if (this.enemies.length >= this.currentLevelConfig.maxEnemies) break
+      const angle = (i / count) * Math.PI * 2
+      const ex = this.W / 2 + Math.cos(angle) * (this.W * 0.6)
+      const ey = this.H / 2 + Math.sin(angle) * (this.H * 0.6)
+      const enemy = this._makeEnemy('notificationSpam', def, ex, ey)
+      this.enemies.push(enemy)
+    }
+  }
+
+  _spawnLinkedPair(typeKey, def) {
+    if (this.enemies.length + 2 > this.currentLevelConfig.maxEnemies) return
+    const posA = this._edgeSpawnPos(def)
+    // Spawn partner offset from A
+    const posB = {
+      x: Phaser.Math.Clamp(posA.x + (Math.random() > 0.5 ? 160 : -160), -def.w, this.W + def.w),
+      y: Phaser.Math.Clamp(posA.y + (Math.random() > 0.5 ? 100 : -100), -def.h, this.H + def.h),
+    }
+    const a = this._makeEnemy(typeKey, def, posA.x, posA.y)
+    const b = this._makeEnemy(typeKey, def, posB.x, posB.y)
+    a.linkedTo = b
+    b.linkedTo = a
+    this.enemies.push(a, b)
   }
 
   _drawEnemy(e) {
     const g = e.gfx
     g.clear()
     const isFlashing = e.hitFlash > 0
+
+    if (e.key === 'notificationSpam') {
+      g.fillStyle(isFlashing ? 0xffffff : 0xff6600, 1)
+      g.fillCircle(e.x, e.y, e.w / 2)
+      g.lineStyle(2, 0xff9944, 1)
+      g.strokeCircle(e.x, e.y, e.w / 2)
+      return
+    }
+
+    if (e.key === 'scopeChange') {
+      const fill = isFlashing ? 0xffffff : 0xff4400
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(3, 0xff8800, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      // Warning stripes
+      if (!isFlashing) {
+        g.fillStyle(0xff8800, 0.3)
+        for (let i = 0; i < 3; i++) {
+          const sx = e.x - e.w / 2 + (i * e.w / 3)
+          g.fillRect(sx, e.y - e.h / 2, e.w / 6, e.h)
+        }
+      }
+      return
+    }
+
+    if (e.key === 'legacySpreadsheet') {
+      const fill = isFlashing ? 0xffffff : 0x1a4a1a
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0x44aa44, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      // Spreadsheet grid lines
+      if (!isFlashing) {
+        g.lineStyle(1, 0x44aa44, 0.4)
+        for (let row = 1; row < 3; row++) {
+          const ly = e.y - e.h / 2 + (row * e.h / 3)
+          g.lineBetween(e.x - e.w / 2 + 4, ly, e.x + e.w / 2 - 4, ly)
+        }
+        for (let col = 1; col < 4; col++) {
+          const lx = e.x - e.w / 2 + (col * e.w / 4)
+          g.lineBetween(lx, e.y - e.h / 2 + 4, lx, e.y + e.h / 2 - 4)
+        }
+      }
+      // Always-visible HP bar
+      const barW = e.w - 8
+      const barH = 5
+      const bx = e.x - barW / 2
+      const by = e.y + e.h / 2 + 4
+      const pct = e.hp / e.maxHp
+      g.fillStyle(0x333333, 1)
+      g.fillRect(bx, by, barW, barH)
+      g.fillStyle(0x44aa44, 1)
+      g.fillRect(bx, by, barW * pct, barH)
+      return
+    }
+
+    if (e.key === 'doubleBooked') {
+      const fill = isFlashing ? 0xffffff : 0x1a3a5c
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
+      g.lineStyle(2, 0x4488ff, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
+      // Calendar header bar
+      if (!isFlashing) {
+        g.fillStyle(0x4488ff, 0.5)
+        g.fillRect(e.x - e.w / 2 + 2, e.y - e.h / 2 + 2, e.w - 4, e.h * 0.28)
+      }
+      return
+    }
+
     const fillColor = isFlashing ? 0xffffff : (e.isBoss ? COLORS.boss : COLORS.enemyFill)
     const strokeColor = e.isBoss ? COLORS.bossStroke : COLORS.enemyStroke
     g.fillStyle(fillColor, 1)
@@ -515,7 +637,6 @@ export class GameScene extends Phaser.Scene {
     g.lineStyle(e.isBoss ? 3 : 2, strokeColor, 1)
     g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
 
-    // Health bar for boss
     if (e.isBoss && e.maxHp > 10) {
       const barW = e.w - 10
       const barH = 6
@@ -532,7 +653,24 @@ export class GameScene extends Phaser.Scene {
   _moveEnemies(dt) {
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const e = this.enemies[i]
-      const angle = Phaser.Math.Angle.Between(e.x, e.y, this.player.x, this.player.y)
+
+      let angle
+      if (e.key === 'scopeChange') {
+        // Erratic: change direction every 0.4-0.8s, bias toward player
+        e.moveTimer = (e.moveTimer || 0) + dt
+        if (e.moveTimer > 0.4 + Math.random() * 0.4) {
+          e.moveTimer = 0
+          const toPlayer = Phaser.Math.Angle.Between(e.x, e.y, this.player.x, this.player.y)
+          // 60% chance to lunge toward player, otherwise random
+          e.moveAngle = Math.random() < 0.6
+            ? toPlayer + (Math.random() - 0.5) * 1.2
+            : Math.random() * Math.PI * 2
+        }
+        angle = e.moveAngle || 0
+      } else {
+        angle = Phaser.Math.Angle.Between(e.x, e.y, this.player.x, this.player.y)
+      }
+
       e.x += Math.cos(angle) * e.speed * dt
       e.y += Math.sin(angle) * e.speed * dt
       e.label.x = e.x
@@ -769,9 +907,35 @@ export class GameScene extends Phaser.Scene {
     e.gfx.destroy()
     e.label.destroy()
 
-    // Update boss state
+    // Free linked partner — it becomes a solo faster enemy
+    if (e.linkedTo) {
+      e.linkedTo.linkedTo = null
+      e.linkedTo.speed = Math.min(e.linkedTo.speed * 1.5, 140)
+      this._showFloatingText(e.linkedTo.x, e.linkedTo.y - 20, 'Unchained!', 0x4488ff)
+    }
+
     if (e.isBoss) {
       gameState.bossActive = false
+    }
+  }
+
+  _drawChains() {
+    this.chainGfx.clear()
+    for (const e of this.enemies) {
+      if (e.linkedTo && e.linkedTo.x > e.x) {
+        // Only draw once per pair (the one with smaller x draws it)
+        this.chainGfx.lineStyle(3, 0x4488ff, 0.7)
+        this.chainGfx.lineBetween(e.x, e.y, e.linkedTo.x, e.linkedTo.y)
+        // Chain links (dots along the line)
+        const steps = 5
+        for (let i = 1; i < steps; i++) {
+          const t = i / steps
+          const cx = e.x + (e.linkedTo.x - e.x) * t
+          const cy = e.y + (e.linkedTo.y - e.y) * t
+          this.chainGfx.fillStyle(0x4488ff, 0.9)
+          this.chainGfx.fillCircle(cx, cy, 4)
+        }
+      }
     }
   }
 
