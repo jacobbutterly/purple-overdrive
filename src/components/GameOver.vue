@@ -1,7 +1,7 @@
 <template>
   <div class="gameover-screen" :class="{ victory: gameState.victory }">
     <div class="gameover-content">
-      <div class="gameover-logo">{{ gameState.victory ? '🏆' : '🟣' }}</div>
+      <div class="gameover-logo">{{ gameState.victory ? '🏆' : '👾' }}</div>
 
       <div v-if="gameState.playerName" class="player-greeting">
         {{ gameState.playerName }}
@@ -25,7 +25,7 @@
 
       <div class="gameover-stats">
         <div class="stat-row">
-          <span class="stat-icon">⚡</span>
+          <span class="stat-icon">🎯</span>
           <span class="stat-label">Score</span>
           <span class="stat-value">{{ formattedScore }}</span>
         </div>
@@ -45,7 +45,7 @@
           <span class="stat-value">{{ gameState.teammateCount + 1 }} {{ gameState.teammateCount === 0 ? '(Solo)' : 'allies' }}</span>
         </div>
         <div class="stat-row">
-          <span class="stat-icon">⚙</span>
+          <span class="stat-icon">🔫</span>
           <span class="stat-label">Weapon Tier</span>
           <span class="stat-value">{{ weaponTierName }}</span>
         </div>
@@ -61,6 +61,7 @@
       </div>
 
       <p class="gameover-hint">Share your score on Slack or Teams!</p>
+      <p class="gameover-credit">Made by Jacob (with Builder) 🚀</p>
     </div>
   </div>
 </template>
@@ -95,15 +96,15 @@ function buildScorecard() {
   const weapon = weaponTierName.value
 
   return [
-    '🟣 Purple Overdrive: A-Team Surge',
+    '👾 Purple Overdrive: A-Team Surge',
     `Agent: ${name}`,
     outcome,
     '─────────────────────────────────',
-    `⚡ Score:        ${score}`,
+    `🎯 Score:        ${score}`,
     `🏆 Level:        ${level}`,
     `🔥 Best Streak:  ${streak}×`,
     `👥 Team Size:    ${team} ${team === 1 ? 'solo' : 'strong'}`,
-    `⚙  Weapon:      ${weapon}`,
+    `🔫 Weapon:       ${weapon}`,
     '─────────────────────────────────',
     'Can you beat this? 🚀 #PurpleOverdrive',
   ].join('\n')
@@ -310,5 +311,14 @@ function copyScorecard() {
   font-size: clamp(9px, 2.5vw, 11px);
   color: #555;
   letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.gameover-credit {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(8px, 2vw, 10px);
+  color: #3a3a3a;
+  letter-spacing: 1px;
+  margin: 0;
 }
 </style>

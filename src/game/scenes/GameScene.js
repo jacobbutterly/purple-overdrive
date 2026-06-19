@@ -463,11 +463,21 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  _pickEnemyType(pool) {
+    let typeKey = pool[Math.floor(Math.random() * pool.length)]
+    const def = ENEMY_TYPES[typeKey]
+    if (def && def.isRare && Math.random() < 0.5) {
+      // 50% chance to reroll for rare enemies
+      typeKey = pool[Math.floor(Math.random() * pool.length)]
+    }
+    return typeKey
+  }
+
   _spawnEnemy() {
     const cfg = this.currentLevelConfig
     if (this.enemies.length >= cfg.maxEnemies) return
 
-    const typeKey = cfg.enemyPool[Math.floor(Math.random() * cfg.enemyPool.length)]
+    const typeKey = this._pickEnemyType(cfg.enemyPool)
     const def = ENEMY_TYPES[typeKey]
     if (!def) return
 
@@ -528,6 +538,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   _spawnNotificationSwarm() {
+    this.audio.sfxSlackNotification()
     const def = ENEMY_TYPES.notificationSpam
     const count = 5 + Math.floor(Math.random() * 3)
     for (let i = 0; i < count; i++) {
@@ -617,6 +628,55 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
+    if (e.key === 'githubOutage') {
+      const fill = isFlashing ? 0xffffff : 0x3a0a0a
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0xcc2222, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.lineStyle(1, 0xcc2222, 0.35)
+        const hw = e.w / 2, hh = e.h / 2
+        g.lineBetween(e.x - hw + 6, e.y - hh + 6, e.x + hw - 6, e.y + hh - 6)
+        g.lineBetween(e.x + hw - 6, e.y - hh + 6, e.x - hw + 6, e.y + hh - 6)
+      }
+      return
+    }
+
+    if (e.key === 'llmFees') {
+      const fill = isFlashing ? 0xffffff : 0x3a2e00
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0xffcc00, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.fillStyle(0xffcc00, 0.18)
+        const cols = 3, rows = 2
+        const cw = e.w / cols, ch = e.h / rows
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            g.fillRect(e.x - e.w / 2 + c * cw + 2, e.y - e.h / 2 + r * ch + 2, cw - 4, ch - 4)
+          }
+        }
+      }
+      return
+    }
+
+    if (e.key === 'alwaysDns') {
+      const fill = isFlashing ? 0xffffff : 0x0a2a2a
+      g.fillStyle(fill, 1)
+      g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      g.lineStyle(2, 0x00aaaa, 1)
+      g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
+      if (!isFlashing) {
+        g.lineStyle(1, 0x00aaaa, 0.4)
+        g.lineBetween(e.x - e.w / 2 + 4, e.y, e.x + e.w / 2 - 4, e.y)
+        g.fillStyle(0x00aaaa, 0.5)
+        g.fillCircle(e.x, e.y, 5)
+      }
+      return
+    }
+
     if (e.key === 'doubleBooked') {
       const fill = isFlashing ? 0xffffff : 0x1a3a5c
       g.fillStyle(fill, 1)
@@ -677,6 +737,13 @@ export class GameScene extends Phaser.Scene {
       e.label.x = e.x
       e.label.y = e.y
       if (e.hitFlash > 0) e.hitFlash -= dt
+
+      if (e.key === 'alwaysDns') {
+        const blink = 0.55 + 0.45 * Math.sin(this.elapsedTime * Math.PI * 2)
+        e.gfx.setAlpha(blink)
+        e.label.setAlpha(blink)
+      }
+
       this._drawEnemy(e)
     }
   }

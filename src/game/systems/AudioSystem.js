@@ -159,6 +159,13 @@ export class AudioSystem {
     this._playOsc(now + 0.5, 150, 0.4, 0.5, 'sawtooth', this.sfxGain)
   }
 
+  sfxSlackNotification() {
+    if (!this.ctx) return
+    const now = this.ctx.currentTime
+    this._playOsc(now, 880, 0.12, 0.08, 'sine', this.sfxGain)
+    this._playOsc(now + 0.1, 1100, 0.1, 0.08, 'sine', this.sfxGain)
+  }
+
   sfxPassion() {
     if (!this.ctx) return
     const now = this.ctx.currentTime

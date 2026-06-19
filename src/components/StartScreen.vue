@@ -1,7 +1,7 @@
 <template>
   <div class="start-screen">
     <div class="start-content">
-      <div class="start-logo">🟣</div>
+      <div class="start-logo">👾</div>
       <h1 class="start-title">Purple Overdrive</h1>
       <p class="start-subtitle">A-Team Surge</p>
       <p class="start-tagline">3 Minutes. 3 Levels. One Team.</p>
