@@ -70,7 +70,7 @@ export const POWERUP_TYPES = {
   innovation: { color: 0xffcc00, label: 'AI',   size: 18 },
   kindness:   { color: 0x44ff88, label: '💚',   size: 18 },
   teammate:   { color: 0xff44cc, label: '👤',   size: 18 },
-  integrity:  { color: 0x4488ff, label: '🛡',   size: 18 },
+  integrity:  { color: 0x4488ff, label: '💎',   size: 18 },
   excellence: { color: 0xffdd00, label: '⭐',   size: 18 },
 }
 

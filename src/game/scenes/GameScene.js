@@ -970,7 +970,7 @@ export class GameScene extends Phaser.Scene {
           this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
         } else {
           this._triggerOverclock()
-          this._showFloatingText(pu.x, pu.y + 36, '⚡ Overclock!', COLORS.innovation)
+          this._showFloatingText(pu.x, pu.y + 36, '💡 Overclock!', COLORS.innovation)
         }
         break
       case 'kindness':

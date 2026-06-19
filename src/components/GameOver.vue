@@ -20,12 +20,6 @@
             : 'The challenges were too great — but the team fights on.' }}
         </p>
 
-        <div v-if="gameState.victory" class="victory-chips">
-          <span class="victory-chip">⚡ Innovation Deployed</span>
-          <span class="victory-chip">🛡 Integrity Held</span>
-          <span class="victory-chip">🎉 Mission Complete</span>
-        </div>
-
         <div class="gameover-stats">
           <div class="stat-row">
             <span class="stat-icon">🎯</span>
@@ -91,10 +85,10 @@ const downloading = ref(false)
 const formattedScore = computed(() => gameState.score.toLocaleString())
 
 const valueStats = computed(() => [
-  { key: 'innovation', icon: '⚡', label: 'Innovation', count: gameState.valuesCollected.innovation },
+  { key: 'innovation', icon: '💡', label: 'Innovation', count: gameState.valuesCollected.innovation },
   { key: 'excellence', icon: '🏆', label: 'Excellence',  count: gameState.valuesCollected.excellence },
   { key: 'teamwork',   icon: '👥', label: 'Teamwork',    count: gameState.valuesCollected.teamwork   },
-  { key: 'integrity',  icon: '🛡', label: 'Integrity',   count: gameState.valuesCollected.integrity  },
+  { key: 'integrity',  icon: '💎', label: 'Integrity',   count: gameState.valuesCollected.integrity  },
   { key: 'kindness',   icon: '💚', label: 'Kindness',    count: gameState.valuesCollected.kindness   },
 ])
 
@@ -117,10 +111,10 @@ function buildScorecard() {
     '─────────────────────────────────',
     `🎯 Score:        ${score}`,
     '── Values Collected ──────────────',
-    `⚡ Innovation:   ${vc.innovation}×`,
+    `💡 Innovation:   ${vc.innovation}×`,
     `🏆 Excellence:   ${vc.excellence}×`,
     `👥 Teamwork:     ${vc.teamwork}×`,
-    `🛡 Integrity:    ${vc.integrity}×`,
+    `💎 Integrity:    ${vc.integrity}×`,
     `💚 Kindness:     ${vc.kindness}×`,
     '─────────────────────────────────',
     'Can you beat this? 🚀 #PurpleOverdrive',
@@ -267,24 +261,6 @@ function copyScorecard() {
   margin: 0 0 16px;
   line-height: 1.5;
   letter-spacing: 0.5px;
-}
-
-.victory-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.victory-chip {
-  font-family: 'Courier New', monospace;
-  font-size: clamp(9px, 2.2vw, 11px);
-  color: #ffd700;
-  border: 1px solid #ffd70044;
-  border-radius: 20px;
-  padding: 4px 10px;
-  background: #ffd7000d;
 }
 
 .gameover-stats {

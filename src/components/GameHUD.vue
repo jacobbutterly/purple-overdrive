@@ -122,7 +122,7 @@ const healthBarColor = computed(() => {
 })
 
 const weaponIcon = computed(() => {
-  const icons = ['', '⚡', '🌀', '✨']
+  const icons = ['', '💡', '🌀', '✨']
   return icons[gameState.weaponTier] || '✨'
 })
 
