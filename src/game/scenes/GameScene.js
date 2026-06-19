@@ -40,6 +40,12 @@ export class GameScene extends Phaser.Scene {
     this.timeSinceLastHit = 0
     this.streakChecked2x = false
     this.streakChecked3x = false
+    this.streakChecked4x = false
+    this.streakChecked5x = false
+
+    // Overclock mode
+    this.overclockTimer = 0
+    this.overclockActive = false
 
     // Passion mode
     this.passionTimer = 0
@@ -200,6 +206,14 @@ export class GameScene extends Phaser.Scene {
       if (this.disruptionTimer <= 0) this._endDisruption()
     }
 
+    if (this.overclockActive) {
+      this.overclockTimer -= dt
+      if (this.overclockTimer <= 0) {
+        this.overclockActive = false
+        this._showFloatingText(this.player.x, this.player.y - 40, 'Overclock Ended', 0xffcc00)
+      }
+    }
+
     // Spawn
     if (this.spawnTimer >= this.currentLevelConfig.spawnInterval) {
       this.spawnTimer = 0
@@ -217,9 +231,10 @@ export class GameScene extends Phaser.Scene {
     this._updateTeammates(dt)
 
     // Auto fire
-    const effectiveFireRate = this.passionActive
+    let effectiveFireRate = this.passionActive
       ? this.currentFireRate * PLAYER.passionFireRateMult
       : this.currentFireRate
+    if (this.overclockActive) effectiveFireRate *= 0.4
     if (this.fireTimer >= effectiveFireRate && gameState.disruptionType !== 'noweapon') {
       this.fireTimer = 0
       this._autoFire()
@@ -889,6 +904,8 @@ export class GameScene extends Phaser.Scene {
         this.timeSinceLastHit = 0
         this.streakChecked2x = false
         this.streakChecked3x = false
+        this.streakChecked4x = false
+        this.streakChecked5x = false
         gameState.streakMultiplier = 1
         this.audio.sfxHit()
 
@@ -935,15 +952,20 @@ export class GameScene extends Phaser.Scene {
 
     switch (pu.key) {
       case 'innovation':
-        gameState.weaponTier = Math.min(3, gameState.weaponTier + 1)
-        this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
+        if (gameState.weaponTier < 3) {
+          gameState.weaponTier++
+          this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
+        } else {
+          this._triggerOverclock()
+          this._showFloatingText(pu.x, pu.y + 36, '⚡ Overclock!', COLORS.innovation)
+        }
         break
       case 'kindness':
         gameState.health = Math.min(100, gameState.health + 25)
         this._showFloatingText(pu.x, pu.y + 36, '+25 Capacity!', COLORS.kindness)
         break
       case 'teammate':
-        if (gameState.teammateCount < 3) {
+        if (gameState.teammateCount < 4) {
           gameState.teammateCount++
           this.teammates.push({ x: this.player.x, y: this.player.y, gfx: this.add.graphics(), fireTimer: 0 })
           this.teammates[this.teammates.length - 1].gfx.setDepth(9)
@@ -955,7 +977,7 @@ export class GameScene extends Phaser.Scene {
         this._showFloatingText(pu.x, pu.y + 36, 'Integrity Shield!', COLORS.integrity)
         break
       case 'excellence':
-        gameState.streakMultiplier = Math.min(3, gameState.streakMultiplier + 1)
+        gameState.streakMultiplier = Math.min(5, gameState.streakMultiplier + 1)
         this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
         break
     }
@@ -1103,9 +1125,27 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.timeSinceLastHit >= TIMING.excellenceStreakTime * 2 && !this.streakChecked3x) {
       this.streakChecked3x = true
-      gameState.streakMultiplier = 3
+      gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 3)
       gameState.bestStreak = Math.max(gameState.bestStreak, 3)
     }
+    if (this.timeSinceLastHit >= 45 && !this.streakChecked4x) {
+      this.streakChecked4x = true
+      gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 4)
+      gameState.bestStreak = Math.max(gameState.bestStreak, 4)
+      this._showFloatingText(this.player.x, this.player.y - 50, '4× Excellence!', COLORS.excellence)
+    }
+    if (this.timeSinceLastHit >= 60 && !this.streakChecked5x) {
+      this.streakChecked5x = true
+      gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 5)
+      gameState.bestStreak = Math.max(gameState.bestStreak, 5)
+      this._showFloatingText(this.player.x, this.player.y - 50, '5× Excellence! UNSTOPPABLE!', COLORS.excellence)
+    }
+  }
+
+  _triggerOverclock() {
+    this.overclockTimer = 4
+    this.overclockActive = true
+    this.audio.sfxLevelUp()
   }
 
   _spawnBoss() {
