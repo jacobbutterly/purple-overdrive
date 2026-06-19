@@ -121,7 +121,12 @@ export class GameScene extends Phaser.Scene {
       gfx: this.add.graphics(),
       shield: false,
     }
-    this.player.gfx.setDepth(10)
+    this.player.gfx.setDepth(9)
+
+    this.player.emoji = this.add.text(this.W / 2, this.H / 2, '👾', {
+      fontSize: '36px',
+    }).setOrigin(0.5).setDepth(10)
+
     this._drawPlayer()
   }
 
@@ -129,25 +134,26 @@ export class GameScene extends Phaser.Scene {
     const g = this.player.gfx
     g.clear()
 
-    // Glow layers
-    const glowColors = [COLORS.playerGlow, COLORS.player]
-    const glowRadii = [this.player.radius + 12, this.player.radius + 6, this.player.radius]
-    glowRadii.forEach((r, i) => {
-      g.fillStyle(glowColors[Math.min(i, glowColors.length - 1)], i === 0 ? 0.15 : i === 1 ? 0.3 : 1)
-      g.fillCircle(this.player.x, this.player.y, r)
-    })
+    // Glow ring underneath emoji
+    g.fillStyle(COLORS.playerGlow, 0.18)
+    g.fillCircle(this.player.x, this.player.y, this.player.radius + 14)
+    g.fillStyle(COLORS.playerGlow, 0.12)
+    g.fillCircle(this.player.x, this.player.y, this.player.radius + 22)
 
     // Passion border
     if (this.passionActive) {
-      g.lineStyle(3, 0xff0000, 1)
-      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 4)
+      g.lineStyle(3, 0xff0000, 0.85)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 6)
     }
 
     // Integrity shield visual
     if (gameState.hasIntegrity) {
       g.lineStyle(2, COLORS.integrity, 0.6)
-      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 16)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 18)
     }
+
+    // Sync emoji position
+    this.player.emoji.setPosition(this.player.x, this.player.y)
   }
 
   _setupGroups() {
