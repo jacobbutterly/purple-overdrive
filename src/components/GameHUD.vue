@@ -8,7 +8,7 @@
       </div>
       <div class="hud-center-block">
         <div class="hud-level-badge" :style="{ background: levelColor }">LVL {{ gameState.level }}</div>
-        <div class="hud-timer" :class="{ hud-timer--urgent: gameState.timeRemaining <= 30 }">
+        <div class="hud-timer" :class="{ 'hud-timer--urgent': gameState.timeRemaining <= 30 }">
           {{ formattedTime }}
         </div>
       </div>

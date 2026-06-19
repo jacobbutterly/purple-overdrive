@@ -196,11 +196,9 @@ export class GameScene extends Phaser.Scene {
     const effectiveFireRate = this.passionActive
       ? this.currentFireRate * PLAYER.passionFireRateMult
       : this.currentFireRate
-    if (this.fireTimer >= effectiveFireRate && !gameState.disruptionType === 'noweapon') {
-      if (gameState.disruptionType !== 'noweapon') {
-        this.fireTimer = 0
-        this._autoFire()
-      }
+    if (this.fireTimer >= effectiveFireRate && gameState.disruptionType !== 'noweapon') {
+      this.fireTimer = 0
+      this._autoFire()
     }
 
     // Move projectiles
@@ -561,14 +559,15 @@ export class GameScene extends Phaser.Scene {
   _drawPowerup(pu) {
     const g = pu.gfx
     g.clear()
+    const py = pu.y + (pu.bobOffset || 0)
     // Glow
     g.fillStyle(pu.color, 0.2)
-    g.fillCircle(pu.x, pu.y, pu.size + 8)
+    g.fillCircle(pu.x, py, pu.size + 8)
     // Diamond shape
     g.fillStyle(pu.color, 1)
     const s = pu.size
-    g.fillTriangle(pu.x, pu.y - s, pu.x + s, pu.y, pu.x, pu.y + s)
-    g.fillTriangle(pu.x, pu.y - s, pu.x - s, pu.y, pu.x, pu.y + s)
+    g.fillTriangle(pu.x, py - s, pu.x + s, py, pu.x, py + s)
+    g.fillTriangle(pu.x, py - s, pu.x - s, py, pu.x, py + s)
   }
 
   _updatePowerups(dt) {
@@ -576,8 +575,7 @@ export class GameScene extends Phaser.Scene {
       const pu = this.powerups[i]
       pu.angle += dt * 2
       pu.life -= dt
-      // Gentle bob
-      pu.gfx.y = Math.sin(pu.angle) * 4
+      pu.bobOffset = Math.sin(pu.angle) * 4
       this._drawPowerup(pu)
       if (pu.life <= 0 || pu.collected) {
         pu.gfx.destroy()
@@ -597,6 +595,7 @@ export class GameScene extends Phaser.Scene {
         ) {
           e.hp -= p.dmg
           e.hitFlash = 0.1
+          if (e.isBoss) gameState.bossHealth = Math.max(0, e.hp)
           p.gfx.destroy()
           this.projectiles.splice(pi, 1)
           if (e.hp <= 0) {
@@ -642,7 +641,8 @@ export class GameScene extends Phaser.Scene {
   _checkPlayerPowerupCollisions() {
     for (let i = this.powerups.length - 1; i >= 0; i--) {
       const pu = this.powerups[i]
-      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, pu.x, pu.y)
+      const puY = pu.y + (pu.bobOffset || 0)
+      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, pu.x, puY)
       if (dist < this.player.radius + pu.size + 4) {
         this._collectPowerup(pu)
         pu.collected = true
