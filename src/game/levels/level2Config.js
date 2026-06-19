@@ -5,6 +5,6 @@ export const level2Config = {
   maxEnemies: 14,
   enemyPool: ['unreadInbox', 'spreadsheet', 'endlessMeeting', 'siloMatrix', 'legacySpreadsheet', 'todoFrom2014', 'scopeChange', 'notificationSpam', 'doubleBooked', 'githubOutage', 'llmFees', 'alwaysDns'],
   powerupInterval: 6000,
-  powerupPool: ['innovation', 'kindness', 'teammate', 'integrity', 'excellence'],
+  powerupPool: ['innovation', 'kindness', 'teammate', 'integrity', 'excellence', 'passion'],
   musicBPM: 110,
 }

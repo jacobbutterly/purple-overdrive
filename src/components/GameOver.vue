@@ -90,6 +90,7 @@ const valueStats = computed(() => [
   { key: 'teamwork',   icon: '👥', label: 'Teamwork',    count: gameState.valuesCollected.teamwork   },
   { key: 'integrity',  icon: '💎', label: 'Integrity',   count: gameState.valuesCollected.integrity  },
   { key: 'kindness',   icon: '💚', label: 'Kindness',    count: gameState.valuesCollected.kindness   },
+  { key: 'passion',    icon: '🔥', label: 'Passion',     count: gameState.valuesCollected.passion    },
 ])
 
 const maxCount = computed(() => Math.max(1, ...valueStats.value.map(v => v.count)))
@@ -116,6 +117,7 @@ function buildScorecard() {
     `👥 Teamwork:     ${vc.teamwork}×`,
     `💎 Integrity:    ${vc.integrity}×`,
     `💚 Kindness:     ${vc.kindness}×`,
+    `🔥 Passion:      ${vc.passion}×`,
     '─────────────────────────────────',
     'Can you beat this? 🚀 #PurpleOverdrive',
   ].join('\n')
