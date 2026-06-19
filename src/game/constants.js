@@ -56,7 +56,8 @@ export const ENEMY_TYPES = {
   theUnknownFuture: { label: 'The Unknown\nFuture',        level: 3, w: 200, h: 120, hp: 500, speed: 40,  score: 1000, isBoss: true },
 
   // Custom obstacles
-  legacySpreadsheet: { label: '@TODO from 2014', level: 1, w: 120, h: 72,  hp: 20,  speed: 28,  score: 60,  isLegacy: true },
+  legacySpreadsheet: { label: 'Legacy Spreadsheet V3_FINAL_FINAL', level: 1, w: 120, h: 72,  hp: 20,  speed: 28,  score: 60,  isLegacy: true },
+  todoFrom2014:      { label: '@TODO from 2014',                   level: 1, w: 110, h: 68,  hp: 16,  speed: 22,  score: 50,  isLegacy: true },
   scopeChange:       { label: '4:55 PM\nScope\nChange',               level: 2, w: 105, h: 62,  hp: 3,   speed: 160, score: 40,  isErratic: true },
   notificationSpam:  { label: '🔔',                                   level: 2, w: 32,  h: 32,  hp: 1,   speed: 230, score: 8,   isSwarm: true },
   doubleBooked:      { label: '📅 Double\nBooked',                    level: 2, w: 88,  h: 58,  hp: 6,   speed: 42,  score: 80,  isLinked: true },
@@ -79,6 +80,7 @@ export const COMIC_TEXTS = {
   legacyRedTape:     ['Disrupted!', 'Modernized!', 'Agile Now!'],
   theUnknownFuture:  ['Future Proof!', 'We Are Ready!', 'What\'s Next?!'],
   legacySpreadsheet: ['Finally Deleted!', 'Data Liberated!', 'No More V4!'],
+  todoFrom2014:      ['TODO: Done!', 'Resolved at Last!', 'Ten Years Late!'],
   scopeChange:       ['Scope Frozen!', 'Change Blocked!', 'Too Late!'],
   notificationSpam:  ['Muted!', 'Do Not Disturb!', 'Silenced!'],
   doubleBooked:      ['Calendar Cleared!', 'Both Declined!', 'Time Reclaimed!'],

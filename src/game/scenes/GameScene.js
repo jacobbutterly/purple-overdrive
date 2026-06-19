@@ -585,15 +585,17 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'legacySpreadsheet') {
-      const fill = isFlashing ? 0xffffff : 0x1a4a1a
+    if (e.key === 'legacySpreadsheet' || e.key === 'todoFrom2014') {
+      const isTodo = e.key === 'todoFrom2014'
+      const fillColor  = isTodo ? 0x3a2e0a : 0x1a4a1a
+      const accentColor = isTodo ? 0xcc9922 : 0x44aa44
+      const fill = isFlashing ? 0xffffff : fillColor
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
-      g.lineStyle(2, 0x44aa44, 1)
+      g.lineStyle(2, accentColor, 1)
       g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
-      // Spreadsheet grid lines
       if (!isFlashing) {
-        g.lineStyle(1, 0x44aa44, 0.4)
+        g.lineStyle(1, accentColor, 0.4)
         for (let row = 1; row < 3; row++) {
           const ly = e.y - e.h / 2 + (row * e.h / 3)
           g.lineBetween(e.x - e.w / 2 + 4, ly, e.x + e.w / 2 - 4, ly)
@@ -603,7 +605,6 @@ export class GameScene extends Phaser.Scene {
           g.lineBetween(lx, e.y - e.h / 2 + 4, lx, e.y + e.h / 2 - 4)
         }
       }
-      // Always-visible HP bar
       const barW = e.w - 8
       const barH = 5
       const bx = e.x - barW / 2
@@ -611,7 +612,7 @@ export class GameScene extends Phaser.Scene {
       const pct = e.hp / e.maxHp
       g.fillStyle(0x333333, 1)
       g.fillRect(bx, by, barW, barH)
-      g.fillStyle(0x44aa44, 1)
+      g.fillStyle(accentColor, 1)
       g.fillRect(bx, by, barW * pct, barH)
       return
     }
