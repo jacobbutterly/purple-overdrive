@@ -134,6 +134,7 @@ export class GameScene extends Phaser.Scene {
     this.enemies = []
     this.projectiles = []
     this.powerups = []
+    this.ripples = []
   }
 
   _setupJoystick() {
@@ -209,6 +210,7 @@ export class GameScene extends Phaser.Scene {
 
     // Move powerups (float)
     this._updatePowerups(dt)
+    this._updateRipples(dt)
 
     // Collisions
     this._checkProjectileEnemyCollisions()
@@ -554,6 +556,35 @@ export class GameScene extends Phaser.Scene {
     const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, angle: 0, life: 12, collected: false }
     this._drawPowerup(pu)
     this.powerups.push(pu)
+    this._spawnRipple(x, y, def.color)
+  }
+
+  _spawnRipple(x, y, color) {
+    for (let i = 0; i < 3; i++) {
+      const gfx = this.add.graphics()
+      gfx.setDepth(6)
+      this.ripples.push({ x, y, color, gfx, radius: 0, maxRadius: 60 + i * 20, alpha: 0.7, delay: i * 0.12, age: 0 })
+    }
+  }
+
+  _updateRipples(dt) {
+    for (let i = this.ripples.length - 1; i >= 0; i--) {
+      const r = this.ripples[i]
+      r.age += dt
+      if (r.age < r.delay) continue
+      const t = (r.age - r.delay) / 0.7
+      r.radius = r.maxRadius * Math.min(t, 1)
+      r.alpha = 0.7 * (1 - Math.min(t, 1))
+      r.gfx.clear()
+      if (r.alpha > 0.01) {
+        r.gfx.lineStyle(2, r.color, r.alpha)
+        r.gfx.strokeCircle(r.x, r.y, r.radius)
+      }
+      if (t >= 1) {
+        r.gfx.destroy()
+        this.ripples.splice(i, 1)
+      }
+    }
   }
 
   _drawPowerup(pu) {
