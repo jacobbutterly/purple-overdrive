@@ -17,7 +17,7 @@
           ⚡ Keep Fighting
         </button>
         <button class="continue-end-btn" @click="endMission">
-          ✓ End Mission
+          {{ gameState.bossActive ? '✓ End Mission' : '🏆 Mission Accomplished' }}
         </button>
       </div>
 
