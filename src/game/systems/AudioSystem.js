@@ -166,6 +166,24 @@ export class AudioSystem {
     this._playOsc(now + 0.15, 660, 0.3, 0.2, 'sawtooth', this.sfxGain)
   }
 
+  sfxVictory() {
+    if (!this.ctx) return
+    const now = this.ctx.currentTime
+    // Triumphant ascending fanfare
+    const melody = [523, 659, 784, 1047, 1319, 1047, 784, 1047, 1319]
+    melody.forEach((f, i) => {
+      this._playOsc(now + i * 0.12, f, 0.25, 0.2, 'sine', this.sfxGain)
+    })
+    // Bass hits
+    ;[0, 0.36, 0.72].forEach(t => {
+      this._playOsc(now + t, 130, 0.3, 0.18, 'square', this.sfxGain)
+    })
+    // Final chord
+    ;[523, 659, 784, 1047].forEach(f => {
+      this._playOsc(now + 1.1, f, 0.2, 0.6, 'sine', this.sfxGain)
+    })
+  }
+
   destroy() {
     this.stopMusic()
     if (this.ctx) this.ctx.close()

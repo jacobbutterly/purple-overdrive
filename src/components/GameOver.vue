@@ -1,9 +1,27 @@
 <template>
-  <div class="gameover-screen">
+  <div class="gameover-screen" :class="{ victory: gameState.victory }">
     <div class="gameover-content">
-      <div class="gameover-logo">🟣</div>
-      <h1 class="gameover-title">Game Over</h1>
-      <p class="gameover-sub">A-Team Surge Complete</p>
+      <div class="gameover-logo">{{ gameState.victory ? '🏆' : '🟣' }}</div>
+
+      <div v-if="gameState.playerName" class="player-greeting">
+        {{ gameState.playerName }}
+      </div>
+
+      <h1 class="gameover-title">
+        {{ gameState.victory ? 'Mission Accomplished' : 'Game Over' }}
+      </h1>
+
+      <p class="gameover-sub">
+        {{ gameState.victory
+          ? 'You overcame every challenge. The A-Team surges on!'
+          : 'The challenges were too great — but the team fights on.' }}
+      </p>
+
+      <div v-if="gameState.victory" class="victory-chips">
+        <span class="victory-chip">⚡ Innovation Deployed</span>
+        <span class="victory-chip">🛡 Integrity Held</span>
+        <span class="victory-chip">🎉 Mission Complete</span>
+      </div>
 
       <div class="gameover-stats">
         <div class="stat-row">
@@ -58,9 +76,7 @@ const copied = ref(false)
 const formattedScore = computed(() => gameState.score.toLocaleString())
 
 const levelLabel = computed(() => {
-  if (gameState.bossActive === false && gameState.level === 3 && gameState.timeRemaining <= 0) {
-    return '3 (Survived!)'
-  }
+  if (gameState.victory) return '3 ✓'
   return `${gameState.level}`
 })
 
@@ -70,14 +86,18 @@ const weaponTierName = computed(() => {
 })
 
 function buildScorecard() {
+  const name = gameState.playerName || 'Agent'
+  const outcome = gameState.victory ? '✅ MISSION ACCOMPLISHED' : '❌ Game Over'
   const score = gameState.score.toLocaleString()
-  const level = gameState.level
+  const level = levelLabel.value
   const streak = gameState.bestStreak
   const team = gameState.teammateCount + 1
   const weapon = weaponTierName.value
 
   return [
     '🟣 Purple Overdrive: A-Team Surge',
+    `Agent: ${name}`,
+    outcome,
     '─────────────────────────────────',
     `⚡ Score:        ${score}`,
     `🏆 Level:        ${level}`,
@@ -95,7 +115,6 @@ function copyScorecard() {
     copied.value = true
     setTimeout(() => { copied.value = false }, 3000)
   }).catch(() => {
-    // Fallback
     const el = document.createElement('textarea')
     el.value = text
     document.body.appendChild(el)
@@ -118,6 +137,11 @@ function copyScorecard() {
   justify-content: center;
   z-index: 200;
   overflow-y: auto;
+  transition: background 0.5s;
+}
+
+.gameover-screen.victory {
+  background: radial-gradient(ellipse at center, #1a2e0a 0%, #0d2000 60%, #000 100%);
 }
 
 .gameover-content {
@@ -128,27 +152,71 @@ function copyScorecard() {
 }
 
 .gameover-logo {
-  font-size: 48px;
+  font-size: 52px;
   margin-bottom: 8px;
   filter: drop-shadow(0 0 16px #9B30FF);
 }
 
+.victory .gameover-logo {
+  filter: drop-shadow(0 0 20px #ffd700);
+  animation: trophy-bounce 0.6s ease-out;
+}
+
+@keyframes trophy-bounce {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.player-greeting {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(11px, 3vw, 14px);
+  color: #cc44ff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
 .gameover-title {
   font-family: 'Courier New', monospace;
-  font-size: clamp(24px, 6.5vw, 38px);
+  font-size: clamp(22px, 6vw, 36px);
   color: #9B30FF;
   text-shadow: 0 0 16px #9B30FF88;
-  margin: 0 0 4px;
+  margin: 0 0 6px;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
+.victory .gameover-title {
+  color: #ffd700;
+  text-shadow: 0 0 20px #ffd70088, 0 0 40px #ffd70044;
+}
+
 .gameover-sub {
   font-family: 'Courier New', monospace;
-  font-size: clamp(11px, 3vw, 14px);
-  color: #ff44cc;
-  margin: 0 0 24px;
-  letter-spacing: 3px;
+  font-size: clamp(10px, 2.8vw, 13px);
+  color: #aaa;
+  margin: 0 0 16px;
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+}
+
+.victory-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.victory-chip {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 11px);
+  color: #ffd700;
+  border: 1px solid #ffd70044;
+  border-radius: 20px;
+  padding: 4px 10px;
+  background: #ffd7000d;
 }
 
 .gameover-stats {
@@ -157,6 +225,11 @@ function copyScorecard() {
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 24px;
+}
+
+.victory .gameover-stats {
+  background: rgba(255, 215, 0, 0.06);
+  border-color: rgba(255, 215, 0, 0.2);
 }
 
 .stat-row {
@@ -208,6 +281,12 @@ function copyScorecard() {
   background: #9B30FF;
   color: #fff;
   box-shadow: 0 0 20px #9B30FF66;
+}
+
+.victory .copy-btn {
+  background: #ffd700;
+  color: #000;
+  box-shadow: 0 0 20px #ffd70066;
 }
 
 .copy-btn.copied {

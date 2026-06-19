@@ -875,10 +875,17 @@ export class GameScene extends Phaser.Scene {
     if (!this.gameRunning) return
     this.gameRunning = false
     this.audio.stopMusic()
-    this.audio.sfxLevelUp()
 
-    // Fade out
-    this.cameras.main.fade(800, 0, 0, 0, false, (cam, progress) => {
+    const survived = gameState.health > 0
+    gameState.victory = survived
+
+    if (survived) {
+      this.audio.sfxVictory()
+    } else {
+      this.audio.sfxLevelUp()
+    }
+
+    this.cameras.main.fade(1000, 0, 0, 0, false, (cam, progress) => {
       if (progress >= 1) {
         gameState.phase = 'gameover'
       }
