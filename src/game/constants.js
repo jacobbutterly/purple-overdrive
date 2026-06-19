@@ -56,7 +56,7 @@ export const ENEMY_TYPES = {
   theUnknownFuture: { label: 'The Unknown\nFuture',        level: 3, w: 200, h: 120, hp: 500, speed: 40,  score: 1000, isBoss: true },
 
   // Custom obstacles
-  legacySpreadsheet: { label: 'Legacy\nSpreadsheet\nV3_FINAL_FINAL', level: 1, w: 120, h: 72,  hp: 20,  speed: 28,  score: 60,  isLegacy: true },
+  legacySpreadsheet: { label: '@TODO from 2014', level: 1, w: 120, h: 72,  hp: 20,  speed: 28,  score: 60,  isLegacy: true },
   scopeChange:       { label: '4:55 PM\nScope\nChange',               level: 2, w: 105, h: 62,  hp: 3,   speed: 160, score: 40,  isErratic: true },
   notificationSpam:  { label: '🔔',                                   level: 2, w: 32,  h: 32,  hp: 1,   speed: 230, score: 8,   isSwarm: true },
   doubleBooked:      { label: '📅 Double\nBooked',                    level: 2, w: 88,  h: 58,  hp: 6,   speed: 42,  score: 80,  isLinked: true },
