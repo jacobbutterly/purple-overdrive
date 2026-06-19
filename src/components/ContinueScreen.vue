@@ -40,6 +40,7 @@ function keepFighting() {
 }
 
 function endMission() {
+  gameState.victory = true  // surviving to time limit = mission accomplished
   gameState.endRequested = true
   gameState.paused = false
   gameState.phase = 'playing'

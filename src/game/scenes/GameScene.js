@@ -1039,6 +1039,8 @@ export class GameScene extends Phaser.Scene {
 
     if (e.isBoss) {
       gameState.bossActive = false
+      this._showBossDefeatedBanner()
+      this.time.delayedCall(2200, () => this._endGame(true))
     }
   }
 
@@ -1207,12 +1209,36 @@ export class GameScene extends Phaser.Scene {
     this.audio.sfxDisruption()
   }
 
-  _endGame() {
+  _showBossDefeatedBanner() {
+    this.audio.sfxVictory()
+    this._spawnConfetti(this.W / 2, this.H / 2, 60)
+
+    const bg = this.add.graphics()
+    bg.fillStyle(0xffd700, 0.85)
+    bg.fillRect(0, this.H / 2 - 65, this.W, 130)
+    bg.setDepth(92)
+
+    const txt = this.add.text(this.W / 2, this.H / 2, '🏆 THE UNKNOWN FUTURE DEFEATED!\nMISSION ACCOMPLISHED!', {
+      fontFamily: 'Courier New',
+      fontSize: Math.min(this.W * 0.048, 20) + 'px',
+      color: '#000000',
+      align: 'center',
+      stroke: '#ffffff',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(93)
+
+    this.tweens.add({
+      targets: [bg, txt], alpha: 0, delay: 1800, duration: 400,
+      onComplete: () => { bg.destroy(); txt.destroy() },
+    })
+  }
+
+  _endGame(forceVictory = false) {
     if (!this.gameRunning) return
     this.gameRunning = false
     this.audio.stopMusic()
 
-    const survived = gameState.health > 0
+    const survived = forceVictory || gameState.victory || gameState.health > 0
     gameState.victory = survived
 
     if (survived) {
