@@ -960,6 +960,7 @@ export class GameScene extends Phaser.Scene {
       teammate: 'Teamwork',
       integrity: 'Integrity',
       excellence: 'Excellence',
+      passion: 'Passion',
     }
     const valueName = VALUE_NAMES[pu.key]
     if (valueName) this._showValueName(pu.x, pu.y, valueName, POWERUP_TYPES[pu.key].color)
@@ -998,6 +999,10 @@ export class GameScene extends Phaser.Scene {
       case 'excellence':
         gameState.streakMultiplier = Math.min(5, gameState.streakMultiplier + 1)
         this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
+        break
+      case 'passion':
+        this._triggerPassion()
+        this._showFloatingText(pu.x, pu.y + 36, '🔥 Passion!', COLORS.passion)
         break
     }
   }

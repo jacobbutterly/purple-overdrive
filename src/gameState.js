@@ -28,6 +28,7 @@ export const gameState = reactive({
     teamwork: 0,
     integrity: 0,
     excellence: 0,
+    passion: 0,
   },
 })
 
@@ -58,5 +59,6 @@ export function resetGameState() {
     teamwork: 0,
     integrity: 0,
     excellence: 0,
+    passion: 0,
   }
 }

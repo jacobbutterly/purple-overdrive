@@ -72,6 +72,7 @@ export const POWERUP_TYPES = {
   teammate:   { color: 0xff44cc, label: '👤',   size: 18 },
   integrity:  { color: 0x4488ff, label: '💎',   size: 18 },
   excellence: { color: 0xffdd00, label: '⭐',   size: 18 },
+  passion:    { color: 0xff4444, label: '🔥',   size: 18 },
 }
 
 export const COMIC_TEXTS = {

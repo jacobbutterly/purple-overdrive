@@ -7,6 +7,6 @@ export const level1Config = {
   maxEnemies: 8,
   enemyPool: ['unreadInbox', 'spreadsheet', 'legacySpreadsheet', 'todoFrom2014', 'alwaysDns'],
   powerupInterval: 8000,
-  powerupPool: ['innovation', 'kindness', 'teammate', 'excellence'],
+  powerupPool: ['innovation', 'kindness', 'teammate', 'excellence', 'passion'],
   musicBPM: 80,
 }
