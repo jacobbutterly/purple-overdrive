@@ -154,7 +154,7 @@ export class GameScene extends Phaser.Scene {
 
     // Sync emoji position and facing direction
     this.player.emoji.setPosition(this.player.x, this.player.y)
-    this.player.emoji.setFlipX(!!this.playerFacingLeft)
+    this.player.emoji.setScale(this.playerFacingLeft ? -1 : 1, 1)
   }
 
   _setupGroups() {
