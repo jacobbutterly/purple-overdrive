@@ -19,6 +19,7 @@ export const gameState = reactive({
   bossActive: false,
   bossHealth: 0,
   bossMaxHealth: 500,
+  paused: false,
 })
 
 export function resetGameState() {
@@ -39,4 +40,5 @@ export function resetGameState() {
   gameState.bossActive = false
   gameState.bossHealth = 0
   gameState.bossMaxHealth = 500
+  gameState.paused = false
 }

@@ -56,12 +56,46 @@
 
     <!-- Passion overlay -->
     <div v-if="gameState.passionActive" class="hud-passion-border"></div>
+
+    <!-- Pause button -->
+    <button class="hud-pause-btn" @click="togglePause" :title="gameState.paused ? 'Resume (P)' : 'Pause (P)'">
+      {{ gameState.paused ? '▶' : '⏸' }}
+    </button>
+
+    <!-- Pause overlay -->
+    <div v-if="gameState.paused" class="pause-overlay">
+      <div class="pause-panel">
+        <div class="pause-logo">👾</div>
+        <h2 class="pause-title">PAUSED</h2>
+        <div class="pause-controls">
+          <div class="pause-control-row">
+            <span class="pause-key">W A S D</span>
+            <span class="pause-sep">or</span>
+            <span class="pause-key">↑ ← ↓ →</span>
+            <span class="pause-action">Move</span>
+          </div>
+          <div class="pause-control-row">
+            <span class="pause-key">Auto</span>
+            <span class="pause-action">Fire (stay near enemies)</span>
+          </div>
+          <div class="pause-control-row">
+            <span class="pause-key">P / Esc</span>
+            <span class="pause-action">Pause / Resume</span>
+          </div>
+        </div>
+        <button class="pause-resume-btn" @click="togglePause">▶ RESUME</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import { gameState } from '../gameState.js'
+
+function togglePause() {
+  gameState.paused = !gameState.paused
+}
 
 const formattedScore = computed(() => {
   return gameState.score.toLocaleString()
@@ -316,4 +350,123 @@ const bossHealthPct = computed(() => {
   from { opacity: 0.5; }
   to { opacity: 1; }
 }
+
+.hud-pause-btn {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #ffffff22;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+  padding: 5px 10px;
+  cursor: pointer;
+  z-index: 60;
+  transition: background 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+
+.hud-pause-btn:hover { background: rgba(155, 48, 255, 0.5); border-color: #9B30FF88; }
+.hud-pause-btn:active { transform: scale(0.94); }
+
+.pause-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 55;
+  pointer-events: auto;
+  backdrop-filter: blur(4px);
+}
+
+.pause-panel {
+  background: linear-gradient(160deg, #1a0a2e 0%, #0d0020 100%);
+  border: 1px solid #9B30FF44;
+  border-radius: 16px;
+  padding: 36px 40px;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 0 60px #9B30FF33;
+}
+
+.pause-logo {
+  font-size: 42px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 16px #9B30FF);
+}
+
+.pause-title {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(22px, 6vw, 32px);
+  color: #9B30FF;
+  text-shadow: 0 0 16px #9B30FF88;
+  margin: 0 0 24px;
+  letter-spacing: 6px;
+}
+
+.pause-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+  text-align: left;
+  background: #ffffff08;
+  border: 1px solid #ffffff11;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.pause-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pause-key {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  color: #ddd;
+  background: #333;
+  border: 1px solid #555;
+  border-bottom: 2px solid #222;
+  border-radius: 4px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+.pause-sep {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: #555;
+}
+
+.pause-action {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 2.5vw, 12px);
+  color: #888;
+}
+
+.pause-resume-btn {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(14px, 4vw, 18px);
+  color: #fff;
+  letter-spacing: 3px;
+  background: #9B30FF;
+  border: none;
+  border-radius: 40px;
+  padding: 13px 32px;
+  cursor: pointer;
+  box-shadow: 0 0 24px #9B30FF88;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pause-resume-btn:hover { box-shadow: 0 0 36px #9B30FFcc; transform: scale(1.03); }
+.pause-resume-btn:active { transform: scale(0.96); }
 </style>

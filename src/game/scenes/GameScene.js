@@ -79,6 +79,20 @@ export class GameScene extends Phaser.Scene {
 
     // Comic text pool
     this.comicTexts = []
+
+    // Keyboard pause
+    this.input.keyboard.on('keydown-ESC', () => this._togglePause())
+    this.input.keyboard.on('keydown-P', () => this._togglePause())
+  }
+
+  _togglePause() {
+    if (!this.gameRunning) return
+    gameState.paused = !gameState.paused
+    if (gameState.paused) {
+      this.audio.stopMusic()
+    } else {
+      this.audio.startMusic(this.currentLevelConfig.musicBPM)
+    }
   }
 
   _setupBackground() {
@@ -153,6 +167,7 @@ export class GameScene extends Phaser.Scene {
 
   update(time, delta) {
     if (!this.gameRunning) return
+    if (gameState.paused) return
 
     const dt = delta / 1000
 
