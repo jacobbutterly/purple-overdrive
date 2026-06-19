@@ -481,9 +481,11 @@ export class GameScene extends Phaser.Scene {
   _pickEnemyType(pool) {
     let typeKey = pool[Math.floor(Math.random() * pool.length)]
     const def = ENEMY_TYPES[typeKey]
-    if (def && def.isRare && Math.random() < 0.5) {
-      // 50% chance to reroll for rare enemies
-      typeKey = pool[Math.floor(Math.random() * pool.length)]
+    if (def && def.isRare && Math.random() < 0.8) {
+      const commonPool = pool.filter(k => !ENEMY_TYPES[k]?.isRare)
+      if (commonPool.length > 0) {
+        typeKey = commonPool[Math.floor(Math.random() * commonPool.length)]
+      }
     }
     return typeKey
   }
@@ -777,6 +779,7 @@ export class GameScene extends Phaser.Scene {
     const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, angle: 0, life: 12, collected: false }
     this._drawPowerup(pu)
     this.powerups.push(pu)
+    this.audio.sfxPowerupSpawn()
     this._spawnRipple(x, y, def.color)
   }
 

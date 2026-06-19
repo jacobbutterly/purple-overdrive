@@ -134,6 +134,15 @@ export class AudioSystem {
     this._playNoise(now, 0.5, 0.3, 100, this.sfxGain)
   }
 
+  sfxPowerupSpawn() {
+    if (!this.ctx) return
+    const now = this.ctx.currentTime
+    const notes = [330, 440, 554]
+    notes.forEach((f, i) => {
+      this._playOsc(now + i * 0.06, f, 0.07, 0.18, 'sine', this.sfxGain)
+    })
+  }
+
   sfxPowerup() {
     if (!this.ctx) return
     const now = this.ctx.currentTime
