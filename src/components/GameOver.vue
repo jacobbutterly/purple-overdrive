@@ -50,9 +50,8 @@
           </div>
         </div>
 
-        <p class="gameover-credit">Made by Jacob (with Builder) 🚀</p>
       </div>
-      <!-- /card-capture -->
+    <!-- /card-capture -->
 
       <div class="gameover-actions">
         <button class="copy-btn" :class="{ copied }" @click="copyScorecard">
@@ -66,7 +65,8 @@
         </button>
       </div>
 
-      <p class="gameover-hint">Share your score on Slack or Teams!</p>
+      <p class="gameover-hint">Share your score on Slack!</p>
+      <p class="gameover-credit">Made by Jacob (with Builder) 🚀</p>
     </div>
   </div>
 </template>
