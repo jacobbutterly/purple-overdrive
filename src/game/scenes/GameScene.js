@@ -858,14 +858,12 @@ export class GameScene extends Phaser.Scene {
     const g = pu.gfx
     g.clear()
     const py = pu.y + (pu.bobOffset || 0)
-    // Glow
-    g.fillStyle(pu.color, 0.25)
-    g.fillCircle(pu.x, py, pu.size + 10)
-    // Diamond shape (slightly transparent so emoji reads clearly)
-    g.fillStyle(pu.color, 0.55)
-    const s = pu.size
-    g.fillTriangle(pu.x, py - s, pu.x + s, py, pu.x, py + s)
-    g.fillTriangle(pu.x, py - s, pu.x - s, py, pu.x, py + s)
+    // Outer soft glow
+    g.fillStyle(pu.color, 0.15)
+    g.fillCircle(pu.x, py, pu.size + 14)
+    // Inner lit background circle
+    g.fillStyle(0xffffff, 0.18)
+    g.fillCircle(pu.x, py, pu.size + 4)
     // Sync emoji text
     if (pu.txt) pu.txt.setPosition(pu.x, py)
   }
