@@ -130,6 +130,18 @@ function buildScorecard() {
 async function downloadImage() {
   if (!cardRef.value || downloading.value) return
   downloading.value = true
+
+  // Freeze all animated elements to their final visible state so html2canvas
+  // captures them fully rendered rather than mid-animation.
+  const animated = cardRef.value.querySelectorAll('.value-row, .gameover-logo, .gameover-title')
+  const saved = []
+  animated.forEach(el => {
+    saved.push({ el, animation: el.style.animation, opacity: el.style.opacity, transform: el.style.transform })
+    el.style.animation = 'none'
+    el.style.opacity = '1'
+    el.style.transform = 'none'
+  })
+
   try {
     const canvas = await html2canvas(cardRef.value, {
       backgroundColor: gameState.victory ? '#0d2000' : '#0d0020',
@@ -144,6 +156,12 @@ async function downloadImage() {
     link.href = canvas.toDataURL('image/png')
     link.click()
   } finally {
+    // Restore original styles
+    saved.forEach(({ el, animation, opacity, transform }) => {
+      el.style.animation = animation
+      el.style.opacity = opacity
+      el.style.transform = transform
+    })
     downloading.value = false
   }
 }
