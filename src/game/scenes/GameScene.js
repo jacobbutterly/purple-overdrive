@@ -169,10 +169,16 @@ export class GameScene extends Phaser.Scene {
     if (!this.gameRunning) return
     if (gameState.paused) return
 
+    // Restart music if player chose to keep fighting
+    if (gameState.continueMode && !this._continueMusicRestarted) {
+      this._continueMusicRestarted = true
+      this.audio.startMusic(this.currentLevelConfig.musicBPM)
+    }
+
     const dt = delta / 1000
 
     this.elapsedTime += dt
-    const remaining = Math.max(0, TIMING.gameDuration - this.elapsedTime)
+    const remaining = gameState.continueMode ? 0 : Math.max(0, TIMING.gameDuration - this.elapsedTime)
     gameState.timeRemaining = Math.ceil(remaining)
 
     // Level transitions
@@ -252,9 +258,18 @@ export class GameScene extends Phaser.Scene {
     // Redraw border flash
     this._updateBorderFlash()
 
-    // Game over
-    if (remaining <= 0) {
+    // End requested from continue screen
+    if (gameState.endRequested) {
+      gameState.endRequested = false
       this._endGame()
+      return
+    }
+
+    // Timer expired — show continue prompt unless already in survival mode
+    if (remaining <= 0 && !gameState.continueMode) {
+      gameState.paused = true
+      gameState.phase = 'continue'
+      this.audio.stopMusic()
     }
   }
 

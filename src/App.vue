@@ -4,6 +4,7 @@
 
     <StartScreen v-if="gameState.phase === 'start'" @start="startGame" />
     <GameHUD v-if="gameState.phase === 'playing'" />
+    <ContinueScreen v-if="gameState.phase === 'continue'" />
     <GameOver v-if="gameState.phase === 'gameover'" @restart="restartGame" />
   </div>
 </template>
@@ -15,6 +16,7 @@ import { createGame, destroyGame } from './game/index.js'
 import StartScreen from './components/StartScreen.vue'
 import GameHUD from './components/GameHUD.vue'
 import GameOver from './components/GameOver.vue'
+import ContinueScreen from './components/ContinueScreen.vue'
 
 let game = null
 

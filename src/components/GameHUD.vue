@@ -8,8 +8,8 @@
       </div>
       <div class="hud-center-block">
         <div class="hud-level-badge" :style="{ background: levelColor }">LVL {{ gameState.level }}</div>
-        <div class="hud-timer" :class="{ 'hud-timer--urgent': gameState.timeRemaining <= 30 }">
-          {{ formattedTime }}
+        <div class="hud-timer" :class="{ 'hud-timer--urgent': gameState.timeRemaining <= 30 && !gameState.continueMode, 'hud-timer--overtime': gameState.continueMode }">
+          {{ gameState.continueMode ? 'OVERTIME' : formattedTime }}
         </div>
       </div>
       <div class="hud-streak-block">
@@ -223,6 +223,14 @@ const bossHealthPct = computed(() => {
   color: #ff4444;
   text-shadow: 0 0 12px #ff444488;
   animation: timer-blink 0.5s ease-in-out infinite;
+}
+
+.hud-timer--overtime {
+  color: #ff8800;
+  font-size: clamp(14px, 4vw, 22px);
+  text-shadow: 0 0 12px #ff880088;
+  letter-spacing: 1px;
+  animation: timer-blink 1.2s ease-in-out infinite;
 }
 
 @keyframes timer-blink {
