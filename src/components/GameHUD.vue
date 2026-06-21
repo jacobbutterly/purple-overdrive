@@ -34,7 +34,10 @@
 
     <!-- Status icons row -->
     <div class="hud-status-row">
-      <div v-if="gameState.hasIntegrity" class="hud-icon hud-icon--integrity" title="Integrity Shield">🛡</div>
+      <div v-if="gameState.hasIntegrity" class="hud-shield-group">
+        <div class="hud-icon hud-icon--integrity" title="Integrity Shield">🛡</div>
+        <span class="hud-shield-label">SHIELD ACTIVE</span>
+      </div>
       <div v-if="gameState.passionActive" class="hud-icon hud-icon--passion" title="Passion Mode!">🔥</div>
       <div v-if="gameState.disruptionActive" class="hud-icon hud-icon--disruption" title="Market Disruption!">⚠</div>
       <div v-for="i in gameState.teammateCount" :key="i" class="hud-icon hud-icon--teammate">👤</div>
@@ -284,6 +287,36 @@ const bossHealthPct = computed(() => {
   background: rgba(0,0,0,0.5);
   border-radius: 6px;
   padding: 2px 6px;
+}
+
+.hud-shield-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-shield-label {
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: bold;
+  color: #44ffdd;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px #44ffdd99;
+  animation: shield-label-pulse 1.6s ease-in-out infinite;
+}
+
+.hud-icon--integrity {
+  animation: shield-glow 1.6s ease-in-out infinite;
+}
+
+@keyframes shield-glow {
+  0%, 100% { box-shadow: 0 0 6px #44ffdd88; transform: scale(1); }
+  50% { box-shadow: 0 0 16px #44ffddcc, 0 0 28px #44ffdd55; transform: scale(1.1); }
+}
+
+@keyframes shield-label-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
 .hud-icon--passion { animation: passion-flash 0.3s ease-in-out infinite alternate; }

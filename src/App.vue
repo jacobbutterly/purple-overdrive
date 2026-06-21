@@ -5,7 +5,7 @@
     <StartScreen v-if="gameState.phase === 'start'" @start="startGame" />
     <GameHUD v-if="gameState.phase === 'playing'" />
     <ContinueScreen v-if="gameState.phase === 'continue'" />
-    <GameOver v-if="gameState.phase === 'gameover'" @restart="restartGame" />
+    <GameOver v-if="gameState.phase === 'gameover'" @restart="restartGame" @home="returnHome" />
   </div>
 </template>
 
@@ -29,10 +29,17 @@ function restartGame() {
     game.destroy(true)
     game = null
   }
-  // Small delay to let Phaser clean up
   setTimeout(() => {
     game = createGame('game-canvas')
   }, 100)
+}
+
+function returnHome() {
+  if (game) {
+    game.destroy(true)
+    game = null
+  }
+  gameState.phase = 'start'
 }
 
 onUnmounted(() => {

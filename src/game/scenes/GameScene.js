@@ -146,10 +146,18 @@ export class GameScene extends Phaser.Scene {
       g.strokeCircle(this.player.x, this.player.y, this.player.radius + 6)
     }
 
-    // Integrity shield visual
+    // Integrity shield visual — layered pulsing rings
     if (gameState.hasIntegrity) {
-      g.lineStyle(2, COLORS.integrity, 0.6)
-      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 18)
+      const pulse = 0.55 + 0.3 * Math.sin(this.time.now * 0.004)
+      // Faint dome fill
+      g.fillStyle(COLORS.integrity, 0.07)
+      g.fillCircle(this.player.x, this.player.y, this.player.radius + 24)
+      // Outer ring
+      g.lineStyle(3, COLORS.integrity, pulse * 0.75)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 24)
+      // Inner ring
+      g.lineStyle(4, COLORS.integrity, pulse)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 14)
     }
 
     // Sync emoji position and facing direction
@@ -1062,6 +1070,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (e.isBoss) {
+      gameState.bossDefeated = true
       gameState.bossActive = false
       this._showBossDefeatedBanner()
       this.time.delayedCall(2200, () => this._endGame(true))
