@@ -11,6 +11,55 @@
         <p>Collect values, build your team, and survive all three levels to achieve mission success.</p>
       </div>
 
+      <!-- THREATS field guide -->
+      <div class="field-section">
+        <div class="field-section-title">THREATS</div>
+        <div class="threats-grid">
+          <div class="threat-card threat-common">
+            <div class="threat-silhouette threat-silhouette--common"></div>
+            <span class="threat-label">⚠ Workplace Challenge</span>
+          </div>
+          <div class="threat-card threat-rare">
+            <div class="threat-silhouette threat-silhouette--rare"></div>
+            <span class="threat-label">★ Rare Threat</span>
+            <span class="threat-rarity-badge">RARE</span>
+          </div>
+          <div class="threat-card threat-swarm">
+            <div class="threat-silhouette threat-silhouette--swarm">
+              <span class="swarm-dot"></span>
+              <span class="swarm-dot"></span>
+              <span class="swarm-dot"></span>
+              <span class="swarm-dot"></span>
+              <span class="swarm-dot"></span>
+            </div>
+            <span class="threat-label">🔔 Notification Swarm</span>
+          </div>
+          <div class="threat-card threat-boss">
+            <div class="threat-silhouette threat-silhouette--boss"></div>
+            <span class="threat-label threat-label--boss">⚠ THE UNKNOWN FUTURE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VALUES field guide -->
+      <div class="field-section">
+        <div class="field-section-title">VALUES</div>
+        <div class="values-grid">
+          <div
+            v-for="v in valueGuide"
+            :key="v.key"
+            class="value-card"
+            :style="{ borderLeftColor: v.cssColor }"
+          >
+            <span class="value-card-icon">{{ v.icon }}</span>
+            <div class="value-card-info">
+              <span class="value-card-name">{{ v.name }}</span>
+              <span class="value-card-effect">{{ v.effect }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="name-section">
         <label class="name-label" for="player-name">Your Callsign</label>
         <input
@@ -73,10 +122,20 @@
 <script setup>
 import { ref } from 'vue'
 import { gameState } from '../gameState.js'
+import { POWERUP_TYPES } from '../game/constants.js'
 
 const emit = defineEmits(['start'])
 const tapped = ref(false)
 const playerName = ref('')
+
+const valueGuide = [
+  { key: 'innovation', icon: POWERUP_TYPES.innovation.label, name: POWERUP_TYPES.innovation.name, effect: POWERUP_TYPES.innovation.effect, cssColor: '#ffcc00' },
+  { key: 'kindness',   icon: POWERUP_TYPES.kindness.label,   name: POWERUP_TYPES.kindness.name,   effect: POWERUP_TYPES.kindness.effect,   cssColor: '#44ff88' },
+  { key: 'teammate',   icon: POWERUP_TYPES.teammate.label,   name: POWERUP_TYPES.teammate.name,   effect: POWERUP_TYPES.teammate.effect,   cssColor: '#ff44cc' },
+  { key: 'integrity',  icon: POWERUP_TYPES.integrity.label,  name: POWERUP_TYPES.integrity.name,  effect: POWERUP_TYPES.integrity.effect,  cssColor: '#4488ff' },
+  { key: 'excellence', icon: POWERUP_TYPES.excellence.label, name: POWERUP_TYPES.excellence.name, effect: POWERUP_TYPES.excellence.effect, cssColor: '#ffdd00' },
+  { key: 'passion',    icon: POWERUP_TYPES.passion.label,    name: POWERUP_TYPES.passion.name,    effect: POWERUP_TYPES.passion.effect,    cssColor: '#ff4444' },
+]
 
 function handleStart() {
   if (tapped.value) return
@@ -154,6 +213,162 @@ function handleStart() {
 .start-mission p { margin: 0 0 4px; }
 .start-mission p:last-child { margin-bottom: 0; }
 
+/* ── Field guide shared ── */
+.field-section {
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.field-section-title {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.5vw, 11px);
+  color: #cc44ff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* ── THREATS ── */
+.threats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.threat-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 12px 8px 10px;
+}
+
+.threat-silhouette {
+  width: 72px;
+  height: 44px;
+  border-radius: 6px;
+}
+
+.threat-silhouette--common {
+  background: #333;
+  border: 2px solid #666;
+}
+
+.threat-silhouette--rare {
+  background: #2a1a1a;
+  border: 2px solid #ff4444;
+}
+
+.threat-silhouette--swarm {
+  width: 72px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding: 4px;
+}
+
+.swarm-dot {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ff6600;
+  border: 1px solid #ff9944;
+  box-shadow: 0 0 6px #ff660088;
+}
+
+.threat-silhouette--boss {
+  width: 88px;
+  height: 52px;
+  background: #222;
+  border: 2px solid #ff0000;
+  box-shadow: 0 0 10px #ff000044;
+}
+
+.threat-label {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: #aaa;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.threat-label--boss {
+  color: #ff4444;
+  font-weight: bold;
+}
+
+.threat-rarity-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: bold;
+  color: #ff4444;
+  border: 1px solid #ff444466;
+  border-radius: 4px;
+  padding: 1px 4px;
+  background: rgba(255,68,68,0.1);
+  letter-spacing: 1px;
+}
+
+/* ── VALUES ── */
+.values-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.value-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-left: 3px solid;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.value-card-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.value-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.value-card-name {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 11px);
+  color: #ddd;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.value-card-effect {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(8px, 1.8vw, 9px);
+  color: #666;
+  line-height: 1.3;
+}
+
+/* ── Name input ── */
 .name-section {
   margin-bottom: 20px;
   text-align: left;
@@ -185,9 +400,9 @@ function handleStart() {
 }
 
 .name-input::placeholder { color: #555; }
-
 .name-input:focus { border-color: #9B30FF; }
 
+/* ── Controls ── */
 .controls-section {
   margin-bottom: 20px;
   text-align: left;
@@ -255,24 +470,7 @@ function handleStart() {
   color: #888;
 }
 
-.start-values {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  justify-content: center;
-  margin-bottom: 24px;
-}
-
-.value-chip {
-  font-family: 'Courier New', monospace;
-  font-size: clamp(9px, 2.5vw, 11px);
-  color: #cc44ff;
-  border: 1px solid #cc44ff44;
-  border-radius: 20px;
-  padding: 4px 10px;
-  background: #cc44ff11;
-}
-
+/* ── Launch button ── */
 .start-btn {
   font-family: 'Courier New', monospace;
   font-size: clamp(15px, 4vw, 22px);
@@ -297,5 +495,11 @@ function handleStart() {
 @keyframes pulse-btn {
   0%, 100% { box-shadow: 0 0 24px #9B30FF88; transform: scale(1); }
   50% { box-shadow: 0 0 48px #9B30FFcc; transform: scale(1.04); }
+}
+
+/* ── Mobile: collapse values to 2 columns ── */
+@media (max-width: 400px) {
+  .threats-grid { grid-template-columns: 1fr; }
+  .values-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>

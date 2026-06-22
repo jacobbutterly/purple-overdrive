@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { gameState, resetGameState } from '../../gameState.js'
-import { COLORS, TIMING, PLAYER, ENEMY_TYPES, POWERUP_TYPES, COMIC_TEXTS } from '../constants.js'
+import { COLORS, TIMING, PLAYER, ENEMY_TYPES, POWERUP_TYPES } from '../constants.js'
 import { JoystickSystem } from '../systems/JoystickSystem.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { level1Config } from '../levels/level1Config.js'
@@ -962,15 +962,7 @@ export class GameScene extends Phaser.Scene {
   _collectPowerup(pu) {
     this.audio.sfxPowerup()
 
-    const VALUE_NAMES = {
-      innovation: 'Innovation',
-      kindness: 'Kindness',
-      teammate: 'Teamwork',
-      integrity: 'Integrity',
-      excellence: 'Excellence',
-      passion: 'Passion',
-    }
-    const valueName = VALUE_NAMES[pu.key]
+    const valueName = POWERUP_TYPES[pu.key]?.name
     if (valueName) this._showValueName(pu.x, pu.y, valueName, POWERUP_TYPES[pu.key].color)
 
     const countKey = pu.key === 'teammate' ? 'teamwork' : pu.key
@@ -1050,7 +1042,7 @@ export class GameScene extends Phaser.Scene {
     gameState.score += pts
 
     // Comic text
-    const lines = COMIC_TEXTS[e.key] || ['Eliminated!']
+    const lines = ENEMY_TYPES[e.key]?.comicTexts || ['Eliminated!']
     const txt = lines[Math.floor(Math.random() * lines.length)]
     this._showFloatingText(e.x, e.y - 20, txt, 0xffffff, true)
 

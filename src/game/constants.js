@@ -47,48 +47,90 @@ export const PLAYER = {
 }
 
 export const ENEMY_TYPES = {
-  unreadInbox:      { label: 'Unread\nInbox',              level: 1, w: 90,  h: 55,  hp: 2,   speed: 55,  score: 10   },
-  spreadsheet:      { label: 'Spread-\nsheet',             level: 1, w: 95,  h: 55,  hp: 2,   speed: 45,  score: 10   },
-  endlessMeeting:   { label: 'Endless\nMeeting',           level: 2, w: 120, h: 70,  hp: 5,   speed: 70,  score: 25   },
-  siloMatrix:       { label: 'Silo\nMatrix',               level: 2, w: 115, h: 70,  hp: 5,   speed: 65,  score: 25   },
-  scopeCreep:       { label: 'Scope\nCreep',               level: 3, w: 145, h: 85,  hp: 10,  speed: 90,  score: 50   },
-  legacyRedTape:    { label: 'Legacy\nRed Tape',           level: 3, w: 150, h: 85,  hp: 10,  speed: 80,  score: 50   },
-  theUnknownFuture: { label: 'The Unknown\nFuture',        level: 3, w: 200, h: 120, hp: 500, speed: 40,  score: 1000, isBoss: true },
+  unreadInbox: {
+    label: 'Unread\nInbox', name: 'Unread Inbox', rarity: 'common',
+    level: 1, w: 90, h: 55, hp: 2, speed: 55, score: 10,
+    comicTexts: ['Archived!', 'Unsubscribed!', 'Auto-replied!'],
+  },
+  spreadsheet: {
+    label: 'Spread-\nsheet', name: 'Spreadsheet', rarity: 'common',
+    level: 1, w: 95, h: 55, hp: 2, speed: 45, score: 10,
+    comicTexts: ['Automated!', 'Pivot That!', "VLOOKUP'd!"],
+  },
+  endlessMeeting: {
+    label: 'Endless\nMeeting', name: 'Endless Meeting', rarity: 'common',
+    level: 2, w: 120, h: 70, hp: 5, speed: 70, score: 25,
+    comicTexts: ['This could have been an email!', 'Calendar Cleared!', 'Declined!'],
+  },
+  siloMatrix: {
+    label: 'Silo\nMatrix', name: 'Silo Matrix', rarity: 'common',
+    level: 2, w: 115, h: 70, hp: 5, speed: 65, score: 25,
+    comicTexts: ['Silos Demolished!', 'Cross-functional!', 'Synergy!'],
+  },
+  scopeCreep: {
+    label: 'Scope\nCreep', name: 'Scope Creep', rarity: 'common',
+    level: 3, w: 145, h: 85, hp: 10, speed: 90, score: 50,
+    comicTexts: ['Scope Locked!', 'MVP Only!', 'Requirements Frozen!'],
+  },
+  legacyRedTape: {
+    label: 'Legacy\nRed Tape', name: 'Legacy Red Tape', rarity: 'common',
+    level: 3, w: 150, h: 85, hp: 10, speed: 80, score: 50,
+    comicTexts: ['Disrupted!', 'Modernized!', 'Agile Now!'],
+  },
+  theUnknownFuture: {
+    label: 'The Unknown\nFuture', name: 'The Unknown Future', rarity: 'boss',
+    level: 3, w: 200, h: 120, hp: 500, speed: 40, score: 1000, isBoss: true,
+    comicTexts: ['Future Proof!', 'We Are Ready!', "What's Next?!"],
+  },
 
-  // Custom obstacles
-  legacySpreadsheet: { label: 'Legacy Spreadsheet V3_FINAL_FINAL', level: 1, w: 120, h: 72,  hp: 20,  speed: 28,  score: 60,  isLegacy: true, isRare: true },
-  todoFrom2014:      { label: '@TODO from 2014',                   level: 1, w: 110, h: 68,  hp: 16,  speed: 22,  score: 50,  isLegacy: true, isRare: true },
-  githubOutage:      { label: 'GitHub\nOutage',                    level: 2, w: 140, h: 80,  hp: 18,  speed: 35,  score: 55,  isRare: true },
-  llmFees:           { label: 'Increased\nLLM Fees 💸',           level: 2, w: 125, h: 72,  hp: 8,   speed: 60,  score: 45,  isRare: true },
-  alwaysDns:         { label: "It's Always\nDNS",                 level: 1, w: 110, h: 65,  hp: 5,   speed: 80,  score: 35,  isRare: true },
-  scopeChange:       { label: '4:55 PM\nScope\nChange',               level: 2, w: 105, h: 62,  hp: 3,   speed: 160, score: 40,  isErratic: true, isRare: true },
-  notificationSpam:  { label: '🔔',                                   level: 2, w: 32,  h: 32,  hp: 1,   speed: 230, score: 8,   isSwarm: true,  isRare: true },
-  doubleBooked:      { label: '📅 Double\nBooked',                    level: 2, w: 88,  h: 58,  hp: 6,   speed: 42,  score: 80,  isLinked: true, isRare: true },
+  // Rare / custom obstacles
+  legacySpreadsheet: {
+    label: 'Legacy Spreadsheet V3_FINAL_FINAL', name: 'Legacy Spreadsheet V3_FINAL_FINAL', rarity: 'rare',
+    level: 1, w: 120, h: 72, hp: 20, speed: 28, score: 60, isLegacy: true, isRare: true,
+    comicTexts: ['Finally Deleted!', 'Data Liberated!', 'No More V4!'],
+  },
+  todoFrom2014: {
+    label: '@TODO from 2014', name: '@TODO from 2014', rarity: 'rare',
+    level: 1, w: 110, h: 68, hp: 16, speed: 22, score: 50, isLegacy: true, isRare: true,
+    comicTexts: ['TODO: Done!', 'Resolved at Last!', 'Ten Years Late!'],
+  },
+  githubOutage: {
+    label: 'GitHub\nOutage', name: 'GitHub Outage', rarity: 'rare',
+    level: 2, w: 140, h: 80, hp: 18, speed: 35, score: 55, isRare: true,
+    comicTexts: ['Push Rejected!', 'Status: Degraded?', 'Back Online!'],
+  },
+  llmFees: {
+    label: 'Increased\nLLM Fees 💸', name: 'Increased LLM Fees', rarity: 'rare',
+    level: 2, w: 125, h: 72, hp: 8, speed: 60, score: 45, isRare: true,
+    comicTexts: ['Costs Cut!', 'Open Source FTW!', 'Budget Saved!'],
+  },
+  alwaysDns: {
+    label: "It's Always\nDNS", name: "It's Always DNS", rarity: 'rare',
+    level: 1, w: 110, h: 65, hp: 5, speed: 80, score: 35, isRare: true,
+    comicTexts: ['Not DNS!', 'It Was DNS.', 'Resolved!'],
+  },
+  scopeChange: {
+    label: '4:55 PM\nScope\nChange', name: '4:55 PM Scope Change', rarity: 'rare',
+    level: 2, w: 105, h: 62, hp: 3, speed: 160, score: 40, isErratic: true, isRare: true,
+    comicTexts: ['Scope Frozen!', 'Change Blocked!', 'Too Late!'],
+  },
+  notificationSpam: {
+    label: '🔔', name: 'Notification Spam', rarity: 'rare',
+    level: 2, w: 32, h: 32, hp: 1, speed: 230, score: 8, isSwarm: true, isRare: true,
+    comicTexts: ['Muted!', 'Do Not Disturb!', 'Silenced!'],
+  },
+  doubleBooked: {
+    label: '📅 Double\nBooked', name: 'Double Booked', rarity: 'rare',
+    level: 2, w: 88, h: 58, hp: 6, speed: 42, score: 80, isLinked: true, isRare: true,
+    comicTexts: ['Calendar Cleared!', 'Both Declined!', 'Time Reclaimed!'],
+  },
 }
 
 export const POWERUP_TYPES = {
-  innovation: { color: 0xffcc00, label: '💡',  size: 18 },
-  kindness:   { color: 0x44ff88, label: '💚',   size: 18 },
-  teammate:   { color: 0xff44cc, label: '👤',   size: 18 },
-  integrity:  { color: 0x4488ff, label: '💎',   size: 18 },
-  excellence: { color: 0xffdd00, label: '⭐',   size: 18 },
-  passion:    { color: 0xff4444, label: '🔥',   size: 18 },
-}
-
-export const COMIC_TEXTS = {
-  unreadInbox:       ['Archived!', 'Unsubscribed!', 'Auto-replied!'],
-  spreadsheet:       ['Automated!', 'Pivot That!', 'VLOOKUP\'d!'],
-  endlessMeeting:    ['This could have been an email!', 'Calendar Cleared!', 'Declined!'],
-  siloMatrix:        ['Silos Demolished!', 'Cross-functional!', 'Synergy!'],
-  scopeCreep:        ['Scope Locked!', 'MVP Only!', 'Requirements Frozen!'],
-  legacyRedTape:     ['Disrupted!', 'Modernized!', 'Agile Now!'],
-  theUnknownFuture:  ['Future Proof!', 'We Are Ready!', 'What\'s Next?!'],
-  legacySpreadsheet: ['Finally Deleted!', 'Data Liberated!', 'No More V4!'],
-  todoFrom2014:      ['TODO: Done!', 'Resolved at Last!', 'Ten Years Late!'],
-  scopeChange:       ['Scope Frozen!', 'Change Blocked!', 'Too Late!'],
-  notificationSpam:  ['Muted!', 'Do Not Disturb!', 'Silenced!'],
-  doubleBooked:      ['Calendar Cleared!', 'Both Declined!', 'Time Reclaimed!'],
-  githubOutage:      ['Push Rejected!', 'Status: Degraded?', 'Back Online!'],
-  llmFees:           ['Costs Cut!', 'Open Source FTW!', 'Budget Saved!'],
-  alwaysDns:         ['Not DNS!', 'It Was DNS.', 'Resolved!'],
+  innovation: { color: 0xffcc00, label: '💡', size: 18, name: 'Innovation', effect: 'Upgrades your weapon' },
+  kindness:   { color: 0x44ff88, label: '💚', size: 18, name: 'Kindness',   effect: 'Restores +25 capacity' },
+  teammate:   { color: 0xff44cc, label: '👤', size: 18, name: 'Teamwork',   effect: 'Adds an orbiting teammate' },
+  integrity:  { color: 0x4488ff, label: '💎', size: 18, name: 'Integrity',  effect: 'Grants an integrity shield' },
+  excellence: { color: 0xffdd00, label: '⭐', size: 18, name: 'Excellence', effect: 'Boosts your score multiplier' },
+  passion:    { color: 0xff4444, label: '🔥', size: 18, name: 'Passion',    effect: 'Triggers speed & fire boost' },
 }
