@@ -46,85 +46,88 @@ export const PLAYER = {
   passionFireRateMult: 0.5, // multiplier on delay (lower = faster)
 }
 
-export const ENEMY_TYPES = {
-  unreadInbox: {
-    label: 'Unread\nInbox', name: 'Unread Inbox', rarity: 'common',
+export const ENEMY_TYPES = [
+  // ── Common ───────────────────────────────────────────────────────────────
+  {
+    name: 'unreadInbox', label: 'Unread\nInbox', rarity: 'common',
     level: 1, w: 90, h: 55, hp: 2, speed: 55, score: 10,
     comicTexts: ['Archived!', 'Unsubscribed!', 'Auto-replied!'],
   },
-  spreadsheet: {
-    label: 'Spread-\nsheet', name: 'Spreadsheet', rarity: 'common',
+  {
+    name: 'spreadsheet', label: 'Spread-\nsheet', rarity: 'common',
     level: 1, w: 95, h: 55, hp: 2, speed: 45, score: 10,
     comicTexts: ['Automated!', 'Pivot That!', "VLOOKUP'd!"],
   },
-  endlessMeeting: {
-    label: 'Endless\nMeeting', name: 'Endless Meeting', rarity: 'common',
+  {
+    name: 'endlessMeeting', label: 'Endless\nMeeting', rarity: 'common',
     level: 2, w: 120, h: 70, hp: 5, speed: 70, score: 25,
     comicTexts: ['This could have been an email!', 'Calendar Cleared!', 'Declined!'],
   },
-  siloMatrix: {
-    label: 'Silo\nMatrix', name: 'Silo Matrix', rarity: 'common',
+  {
+    name: 'siloMatrix', label: 'Silo\nMatrix', rarity: 'common',
     level: 2, w: 115, h: 70, hp: 5, speed: 65, score: 25,
     comicTexts: ['Silos Demolished!', 'Cross-functional!', 'Synergy!'],
   },
-  scopeCreep: {
-    label: 'Scope\nCreep', name: 'Scope Creep', rarity: 'common',
+  {
+    name: 'scopeCreep', label: 'Scope\nCreep', rarity: 'common',
     level: 3, w: 145, h: 85, hp: 10, speed: 90, score: 50,
     comicTexts: ['Scope Locked!', 'MVP Only!', 'Requirements Frozen!'],
   },
-  legacyRedTape: {
-    label: 'Legacy\nRed Tape', name: 'Legacy Red Tape', rarity: 'common',
+  {
+    name: 'legacyRedTape', label: 'Legacy\nRed Tape', rarity: 'common',
     level: 3, w: 150, h: 85, hp: 10, speed: 80, score: 50,
     comicTexts: ['Disrupted!', 'Modernized!', 'Agile Now!'],
   },
-  theUnknownFuture: {
-    label: 'The Unknown\nFuture', name: 'The Unknown Future', rarity: 'boss',
-    level: 3, w: 200, h: 120, hp: 500, speed: 40, score: 1000, isBoss: true,
-    comicTexts: ['Future Proof!', 'We Are Ready!', "What's Next?!"],
-  },
 
-  // Rare / custom obstacles
-  legacySpreadsheet: {
-    label: 'Legacy Spreadsheet V3_FINAL_FINAL', name: 'Legacy Spreadsheet V3_FINAL_FINAL', rarity: 'rare',
+  // ── Rare ─────────────────────────────────────────────────────────────────
+  {
+    name: 'legacySpreadsheet', label: 'Legacy Spreadsheet V3_FINAL_FINAL', rarity: 'rare',
     level: 1, w: 120, h: 72, hp: 20, speed: 28, score: 60, isLegacy: true, isRare: true,
     comicTexts: ['Finally Deleted!', 'Data Liberated!', 'No More V4!'],
   },
-  todoFrom2014: {
-    label: '@TODO from 2014', name: '@TODO from 2014', rarity: 'rare',
+  {
+    name: 'todoFrom2014', label: '@TODO from 2014', rarity: 'rare',
     level: 1, w: 110, h: 68, hp: 16, speed: 22, score: 50, isLegacy: true, isRare: true,
     comicTexts: ['TODO: Done!', 'Resolved at Last!', 'Ten Years Late!'],
   },
-  githubOutage: {
-    label: 'GitHub\nOutage', name: 'GitHub Outage', rarity: 'rare',
+  {
+    name: 'githubOutage', label: 'GitHub\nOutage', rarity: 'rare',
     level: 2, w: 140, h: 80, hp: 18, speed: 35, score: 55, isRare: true,
     comicTexts: ['Push Rejected!', 'Status: Degraded?', 'Back Online!'],
   },
-  llmFees: {
-    label: 'Increased\nLLM Fees 💸', name: 'Increased LLM Fees', rarity: 'rare',
+  {
+    name: 'llmFees', label: 'Increased\nLLM Fees 💸', rarity: 'rare',
     level: 2, w: 125, h: 72, hp: 8, speed: 60, score: 45, isRare: true,
     comicTexts: ['Costs Cut!', 'Open Source FTW!', 'Budget Saved!'],
   },
-  alwaysDns: {
-    label: "It's Always\nDNS", name: "It's Always DNS", rarity: 'rare',
+  {
+    name: 'alwaysDns', label: "It's Always\nDNS", rarity: 'rare',
     level: 1, w: 110, h: 65, hp: 5, speed: 80, score: 35, isRare: true,
     comicTexts: ['Not DNS!', 'It Was DNS.', 'Resolved!'],
   },
-  scopeChange: {
-    label: '4:55 PM\nScope\nChange', name: '4:55 PM Scope Change', rarity: 'rare',
+  {
+    name: 'scopeChange', label: '4:55 PM\nScope\nChange', rarity: 'rare',
     level: 2, w: 105, h: 62, hp: 3, speed: 160, score: 40, isErratic: true, isRare: true,
     comicTexts: ['Scope Frozen!', 'Change Blocked!', 'Too Late!'],
   },
-  notificationSpam: {
-    label: '🔔', name: 'Notification Spam', rarity: 'rare',
+  {
+    name: 'notificationSpam', label: '🔔', rarity: 'rare',
     level: 2, w: 32, h: 32, hp: 1, speed: 230, score: 8, isSwarm: true, isRare: true,
     comicTexts: ['Muted!', 'Do Not Disturb!', 'Silenced!'],
   },
-  doubleBooked: {
-    label: '📅 Double\nBooked', name: 'Double Booked', rarity: 'rare',
+  {
+    name: 'doubleBooked', label: '📅 Double\nBooked', rarity: 'rare',
     level: 2, w: 88, h: 58, hp: 6, speed: 42, score: 80, isLinked: true, isRare: true,
     comicTexts: ['Calendar Cleared!', 'Both Declined!', 'Time Reclaimed!'],
   },
-}
+
+  // ── Boss ─────────────────────────────────────────────────────────────────
+  {
+    name: 'theUnknownFuture', label: 'The Unknown\nFuture', rarity: 'boss',
+    level: 3, w: 200, h: 120, hp: 500, speed: 40, score: 1000, isBoss: true,
+    comicTexts: ['Future Proof!', 'We Are Ready!', "What's Next?!"],
+  },
+]
 
 export const POWERUP_TYPES = {
   innovation: { color: 0xffcc00, label: '💡', size: 18, name: 'Innovation', effect: 'Upgrades your weapon' },

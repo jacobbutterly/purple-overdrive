@@ -524,30 +524,26 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  _pickEnemyType(pool) {
-    let typeKey = pool[Math.floor(Math.random() * pool.length)]
-    const def = ENEMY_TYPES[typeKey]
-    if (def && def.isRare && Math.random() < 0.8) {
-      const commonPool = pool.filter(k => !ENEMY_TYPES[k]?.isRare)
-      if (commonPool.length > 0) {
-        typeKey = commonPool[Math.floor(Math.random() * commonPool.length)]
-      }
+  _pickEnemyDef(pool) {
+    let def = pool[Math.floor(Math.random() * pool.length)]
+    if (def.isRare && Math.random() < 0.8) {
+      const commonPool = pool.filter(d => !d.isRare)
+      if (commonPool.length > 0) def = commonPool[Math.floor(Math.random() * commonPool.length)]
     }
-    return typeKey
+    return def
   }
 
   _spawnEnemy() {
     const cfg = this.currentLevelConfig
     if (this.enemies.length >= cfg.maxEnemies) return
 
-    const typeKey = this._pickEnemyType(cfg.enemyPool)
-    const def = ENEMY_TYPES[typeKey]
+    const def = this._pickEnemyDef(cfg.enemyPool)
     if (!def) return
 
     if (def.isSwarm) { this._spawnNotificationSwarm(); return }
-    if (def.isLinked) { this._spawnLinkedPair(typeKey, def); return }
+    if (def.isLinked) { this._spawnLinkedPair(def); return }
 
-    this._spawnSingleEnemy(typeKey, def)
+    this._spawnSingleEnemy(def)
   }
 
   _edgeSpawnPos(def) {
@@ -558,7 +554,7 @@ export class GameScene extends Phaser.Scene {
     return { x: -def.w, y: Math.random() * this.H }
   }
 
-  _makeEnemy(typeKey, def, x, y, extra = {}) {
+  _makeEnemy(def, x, y, extra = {}) {
     const gfx = this.add.graphics()
     gfx.setDepth(5)
     const textStyle = {
@@ -570,10 +566,11 @@ export class GameScene extends Phaser.Scene {
     }
     const label = this.add.text(x, y, def.label, textStyle).setOrigin(0.5).setDepth(6)
     const enemy = {
-      key: typeKey, x, y,
+      name: def.name, x, y,
       w: def.w, h: def.h,
       hp: def.hp, maxHp: def.hp,
       speed: def.speed, score: def.score,
+      comicTexts: def.comicTexts,
       gfx, label,
       isBoss: !!def.isBoss,
       hitFlash: 0,
@@ -583,47 +580,44 @@ export class GameScene extends Phaser.Scene {
     return enemy
   }
 
-  _spawnSingleEnemy(typeKey, def) {
-    const def_ = def || ENEMY_TYPES[typeKey]
+  _spawnSingleEnemy(def) {
     let x, y
-    if (def_.isErratic) {
-      // Scope change spawns at a random interior point
+    if (def.isErratic) {
       const margin = 80
       x = margin + Math.random() * (this.W - margin * 2)
       y = margin + Math.random() * (this.H - margin * 2)
     } else {
-      const pos = this._edgeSpawnPos(def_)
+      const pos = this._edgeSpawnPos(def)
       x = pos.x; y = pos.y
     }
-    const extra = def_.isErratic ? { moveAngle: Math.random() * Math.PI * 2, moveTimer: 0 } : {}
-    const enemy = this._makeEnemy(typeKey, def_, x, y, extra)
+    const extra = def.isErratic ? { moveAngle: Math.random() * Math.PI * 2, moveTimer: 0 } : {}
+    const enemy = this._makeEnemy(def, x, y, extra)
     this.enemies.push(enemy)
   }
 
   _spawnNotificationSwarm() {
     this.audio.sfxSlackNotification()
-    const def = ENEMY_TYPES.notificationSpam
+    const def = ENEMY_TYPES.find(e => e.name === 'notificationSpam')
     const count = 5 + Math.floor(Math.random() * 3)
     for (let i = 0; i < count; i++) {
       if (this.enemies.length >= this.currentLevelConfig.maxEnemies) break
       const angle = (i / count) * Math.PI * 2
       const ex = this.W / 2 + Math.cos(angle) * (this.W * 0.6)
       const ey = this.H / 2 + Math.sin(angle) * (this.H * 0.6)
-      const enemy = this._makeEnemy('notificationSpam', def, ex, ey)
+      const enemy = this._makeEnemy(def, ex, ey)
       this.enemies.push(enemy)
     }
   }
 
-  _spawnLinkedPair(typeKey, def) {
+  _spawnLinkedPair(def) {
     if (this.enemies.length + 2 > this.currentLevelConfig.maxEnemies) return
     const posA = this._edgeSpawnPos(def)
-    // Spawn partner offset from A
     const posB = {
       x: Phaser.Math.Clamp(posA.x + (Math.random() > 0.5 ? 160 : -160), -def.w, this.W + def.w),
       y: Phaser.Math.Clamp(posA.y + (Math.random() > 0.5 ? 100 : -100), -def.h, this.H + def.h),
     }
-    const a = this._makeEnemy(typeKey, def, posA.x, posA.y)
-    const b = this._makeEnemy(typeKey, def, posB.x, posB.y)
+    const a = this._makeEnemy(def, posA.x, posA.y)
+    const b = this._makeEnemy(def, posB.x, posB.y)
     a.linkedTo = b
     b.linkedTo = a
     this.enemies.push(a, b)
@@ -634,7 +628,7 @@ export class GameScene extends Phaser.Scene {
     g.clear()
     const isFlashing = e.hitFlash > 0
 
-    if (e.key === 'notificationSpam') {
+    if (e.name === 'notificationSpam') {
       g.fillStyle(isFlashing ? 0xffffff : 0xff6600, 1)
       g.fillCircle(e.x, e.y, e.w / 2)
       g.lineStyle(2, 0xff9944, 1)
@@ -642,7 +636,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'scopeChange') {
+    if (e.name === 'scopeChange') {
       const fill = isFlashing ? 0xffffff : 0xff4400
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -659,8 +653,8 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'legacySpreadsheet' || e.key === 'todoFrom2014') {
-      const isTodo = e.key === 'todoFrom2014'
+    if (e.name === 'legacySpreadsheet' || e.name === 'todoFrom2014') {
+      const isTodo = e.name === 'todoFrom2014'
       const fillColor  = isTodo ? 0x3a2e0a : 0x1a4a1a
       const accentColor = isTodo ? 0xcc9922 : 0x44aa44
       const fill = isFlashing ? 0xffffff : fillColor
@@ -691,7 +685,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'githubOutage') {
+    if (e.name === 'githubOutage') {
       const fill = isFlashing ? 0xffffff : 0x3a0a0a
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -706,7 +700,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'llmFees') {
+    if (e.name === 'llmFees') {
       const fill = isFlashing ? 0xffffff : 0x3a2e00
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -725,7 +719,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'alwaysDns') {
+    if (e.name === 'alwaysDns') {
       const fill = isFlashing ? 0xffffff : 0x0a2a2a
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -740,7 +734,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'doubleBooked') {
+    if (e.name === 'doubleBooked') {
       const fill = isFlashing ? 0xffffff : 0x1a3a5c
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
@@ -779,7 +773,7 @@ export class GameScene extends Phaser.Scene {
       const e = this.enemies[i]
 
       let angle
-      if (e.key === 'scopeChange') {
+      if (e.name === 'scopeChange') {
         // Erratic: change direction every 0.4-0.8s, bias toward player
         e.moveTimer = (e.moveTimer || 0) + dt
         if (e.moveTimer > 0.4 + Math.random() * 0.4) {
@@ -801,7 +795,7 @@ export class GameScene extends Phaser.Scene {
       e.label.y = e.y
       if (e.hitFlash > 0) e.hitFlash -= dt
 
-      if (e.key === 'alwaysDns') {
+      if (e.name === 'alwaysDns') {
         const blink = 0.55 + 0.45 * Math.sin(this.elapsedTime * Math.PI * 2)
         e.gfx.setAlpha(blink)
         e.label.setAlpha(blink)
@@ -1042,7 +1036,7 @@ export class GameScene extends Phaser.Scene {
     gameState.score += pts
 
     // Comic text
-    const lines = ENEMY_TYPES[e.key]?.comicTexts || ['Eliminated!']
+    const lines = e.comicTexts || ['Eliminated!']
     const txt = lines[Math.floor(Math.random() * lines.length)]
     this._showFloatingText(e.x, e.y - 20, txt, 0xffffff, true)
 
@@ -1176,7 +1170,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   _spawnBoss() {
-    const def = ENEMY_TYPES['theUnknownFuture']
+    const def = ENEMY_TYPES.find(e => e.name === 'theUnknownFuture')
     const x = this.W / 2
     const y = -def.h
 
@@ -1193,13 +1187,14 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(6)
 
     const boss = {
-      key: 'theUnknownFuture',
+      name: 'theUnknownFuture',
       x, y,
       w: def.w, h: def.h,
       hp: def.hp,
       maxHp: def.hp,
       speed: def.speed,
       score: def.score,
+      comicTexts: def.comicTexts,
       gfx, label,
       isBoss: true,
       hitFlash: 0,
