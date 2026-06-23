@@ -21,7 +21,7 @@
           </div>
           <div class="threat-card threat-rare">
             <div class="threat-silhouette threat-silhouette--rare"></div>
-            <span class="threat-label">★ Rare Threat</span>
+            <span class="threat-label">★ Difficult Threat</span>
             <span class="threat-rarity-badge">Difficult</span>
           </div>
           <div class="threat-card threat-swarm">
