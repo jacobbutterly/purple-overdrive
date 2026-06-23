@@ -11,55 +11,6 @@
         <p>Collect values, build your team, and survive all three levels to achieve mission success.</p>
       </div>
 
-      <!-- THREATS field guide -->
-      <div class="field-section">
-        <div class="field-section-title">THREATS</div>
-        <div class="threats-grid">
-          <div class="threat-card threat-common">
-            <div class="threat-silhouette threat-silhouette--common"></div>
-            <span class="threat-label">⚠ Workplace Challenge</span>
-          </div>
-          <div class="threat-card threat-rare">
-            <div class="threat-silhouette threat-silhouette--rare"></div>
-            <span class="threat-label">★ Difficult Challenge</span>
-            <span class="threat-rarity-badge">HARD</span>
-          </div>
-          <div class="threat-card threat-swarm">
-            <div class="threat-silhouette threat-silhouette--swarm">
-              <span class="swarm-dot"></span>
-              <span class="swarm-dot"></span>
-              <span class="swarm-dot"></span>
-              <span class="swarm-dot"></span>
-              <span class="swarm-dot"></span>
-            </div>
-            <span class="threat-label">🔔 Notification Swarm</span>
-          </div>
-          <div class="threat-card threat-boss">
-            <div class="threat-silhouette threat-silhouette--boss"></div>
-            <span class="threat-label threat-label--boss">⚠ THE UNKNOWN FUTURE</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- VALUES field guide -->
-      <div class="field-section">
-        <div class="field-section-title">VALUES</div>
-        <div class="values-grid">
-          <div
-            v-for="v in valueGuide"
-            :key="v.key"
-            class="value-card"
-            :style="{ borderLeftColor: v.cssColor }"
-          >
-            <span class="value-card-icon">{{ v.icon }}</span>
-            <div class="value-card-info">
-              <span class="value-card-name">{{ v.name }}</span>
-              <span class="value-card-effect">{{ v.effect }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="name-section">
         <label class="name-label" for="player-name">Your Callsign</label>
         <input
@@ -115,6 +66,63 @@
       >
         {{ tapped ? 'Get Ready...' : 'LAUNCH MISSION' }}
       </button>
+
+      <!-- Field guide toggle -->
+      <button class="field-guide-toggle" @click="fieldGuideOpen = !fieldGuideOpen">
+        📖 Field Guide
+        <span class="field-guide-chevron" :class="{ open: fieldGuideOpen }">▾</span>
+      </button>
+
+      <div class="field-guide-body" :class="{ open: fieldGuideOpen }">
+        <!-- THREATS -->
+        <div class="field-section">
+          <div class="field-section-title">THREATS</div>
+          <div class="threats-grid">
+            <div class="threat-card threat-common">
+              <div class="threat-silhouette threat-silhouette--common"></div>
+              <span class="threat-label">⚠ Workplace Challenge</span>
+            </div>
+            <div class="threat-card threat-rare">
+              <div class="threat-silhouette threat-silhouette--rare"></div>
+              <span class="threat-label">★ Rare Threat</span>
+              <span class="threat-rarity-badge">RARE</span>
+            </div>
+            <div class="threat-card threat-swarm">
+              <div class="threat-silhouette threat-silhouette--swarm">
+                <span class="swarm-dot"></span>
+                <span class="swarm-dot"></span>
+                <span class="swarm-dot"></span>
+                <span class="swarm-dot"></span>
+                <span class="swarm-dot"></span>
+              </div>
+              <span class="threat-label">🔔 Notification Swarm</span>
+            </div>
+            <div class="threat-card threat-boss">
+              <div class="threat-silhouette threat-silhouette--boss"></div>
+              <span class="threat-label threat-label--boss">⚠ THE UNKNOWN FUTURE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VALUES -->
+        <div class="field-section">
+          <div class="field-section-title">VALUES</div>
+          <div class="values-grid">
+            <div
+              v-for="v in valueGuide"
+              :key="v.key"
+              class="value-card"
+              :style="{ borderLeftColor: v.cssColor }"
+            >
+              <span class="value-card-icon">{{ v.icon }}</span>
+              <div class="value-card-info">
+                <span class="value-card-name">{{ v.name }}</span>
+                <span class="value-card-effect">{{ v.effect }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -127,6 +135,7 @@ import { POWERUP_TYPES } from '../game/constants.js'
 const emit = defineEmits(['start'])
 const tapped = ref(false)
 const playerName = ref('')
+const fieldGuideOpen = ref(false)
 
 const valueGuide = [
   { key: 'innovation', icon: POWERUP_TYPES.innovation.label, name: POWERUP_TYPES.innovation.name, effect: POWERUP_TYPES.innovation.effect, cssColor: '#ffcc00' },
@@ -495,6 +504,57 @@ function handleStart() {
 @keyframes pulse-btn {
   0%, 100% { box-shadow: 0 0 24px #9B30FF88; transform: scale(1); }
   50% { box-shadow: 0 0 48px #9B30FFcc; transform: scale(1.04); }
+}
+
+/* ── Field guide toggle + drawer ── */
+.field-guide-toggle {
+  width: 100%;
+  margin-top: 14px;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 2.8vw, 12px);
+  color: #cc44ff;
+  background: transparent;
+  border: 1px solid #cc44ff33;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.field-guide-toggle:hover {
+  border-color: #cc44ff88;
+  background: #cc44ff0a;
+}
+
+.field-guide-chevron {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  font-size: 12px;
+}
+
+.field-guide-chevron.open {
+  transform: rotate(180deg);
+}
+
+.field-guide-body {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.field-guide-body.open {
+  max-height: 900px;
+  opacity: 1;
+}
+
+.field-guide-body .field-section:first-child {
+  margin-top: 18px;
 }
 
 /* ── Mobile: collapse values to 2 columns ── */
