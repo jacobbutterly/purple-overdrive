@@ -56,7 +56,12 @@ export const ENEMY_TYPES = [
   {
     name: 'spreadsheet', label: 'Spread-\nsheet', rarity: 'common',
     level: 1, w: 95, h: 55, hp: 2, speed: 45, score: 10,
-    comicTexts: ['Automated!', 'Pivot That!', "VLOOKUP'd!"],
+    comicTexts: ['Automated!', 'Pivot That!', 'Data Liberated!'],
+  },
+  {
+    name: 'manualOkrTracking', label: 'Manual OKR\nTracking', rarity: 'common',
+    level: 1, w: 100, h: 55, hp: 2, speed: 50, score: 10,
+    comicTexts: ['Auto-Tracked!', '100% Achieved!', 'Algorithmic Success!'],
   },
   {
     name: 'endlessMeeting', label: 'Endless\nMeeting', rarity: 'common',
@@ -64,9 +69,9 @@ export const ENEMY_TYPES = [
     comicTexts: ['This could have been an email!', 'Calendar Cleared!', 'Declined!'],
   },
   {
-    name: 'siloMatrix', label: 'Silo\nMatrix', rarity: 'common',
-    level: 2, w: 115, h: 70, hp: 5, speed: 65, score: 25,
-    comicTexts: ['Silos Demolished!', 'Cross-functional!', 'Synergy!'],
+    name: 'outdatedStats', label: 'Outdated\nDeck Stats', rarity: 'common',
+    level: 2, w: 115, h: 70, hp: 6, speed: 60, score: 25,
+    comicTexts: ['Auto-Corrected!', 'Real-Time Retcon!', 'Fresh Data!'],
   },
   {
     name: 'scopeCreep', label: 'Scope\nCreep', rarity: 'common',
@@ -86,6 +91,11 @@ export const ENEMY_TYPES = [
     comicTexts: ['Finally Deleted!', 'Data Liberated!', 'No More V4!'],
   },
   {
+    name: 'timeZoneManagement', label: 'Time Zone\nChaos', rarity: 'rare',
+    level: 1, w: 110, h: 65, hp: 4, speed: 75, score: 30, isRare: true,
+    comicTexts: ['Time Travel Active!', 'Jetlag Cured!', 'AI Synced!'],
+  },
+  {
     name: 'todoFrom2014', label: '@TODO from 2014', rarity: 'rare',
     level: 1, w: 110, h: 68, hp: 16, speed: 22, score: 50, isLegacy: true, isRare: true,
     comicTexts: ['TODO: Done!', 'Resolved at Last!', 'Ten Years Late!'],
@@ -94,6 +104,11 @@ export const ENEMY_TYPES = [
     name: 'githubOutage', label: 'GitHub\nOutage', rarity: 'rare',
     level: 2, w: 140, h: 80, hp: 18, speed: 35, score: 55, isRare: true,
     comicTexts: ['Push Rejected!', 'Status: Degraded?', 'Back Online!'],
+  },
+  {
+    name: 'customDeckBuilding', label: 'Custom Deck\nRequest', rarity: 'rare',
+    level: 2, w: 130, h: 75, hp: 12, speed: 40, score: 65, isRare: true,
+    comicTexts: ['Slides Generated!', 'Decks Dispatched!', 'Bullet Points Automated!'],
   },
   {
     name: 'llmFees', label: 'Increased\nLLM Fees 💸', rarity: 'rare',
@@ -119,6 +134,11 @@ export const ENEMY_TYPES = [
     name: 'doubleBooked', label: '📅 Double\nBooked', rarity: 'rare',
     level: 2, w: 88, h: 58, hp: 6, speed: 42, score: 80, isLinked: true, isRare: true,
     comicTexts: ['Calendar Cleared!', 'Both Declined!', 'Time Reclaimed!'],
+  },
+  {
+    name: 'jargonDocumentation', label: 'Internal Jargon\nDocumentation', rarity: 'common',
+    level: 3, w: 140, h: 85, hp: 12, speed: 85, score: 50,
+    comicTexts: ['Translated to Human!', 'Corporate Filter Active!', 'Plain Text Mode!'],
   },
 
   // ── Boss ─────────────────────────────────────────────────────────────────
