@@ -1,93 +1,81 @@
 <template>
   <div class="start-screen">
     <div class="start-content">
+      <!-- Shared header — always visible above tabs -->
       <div class="start-logo">👾</div>
       <h1 class="start-title">Purple Overdrive</h1>
       <p class="start-subtitle">A-Team Surge</p>
       <p class="start-tagline">3 Minutes. 3 Levels. One Team.</p>
 
-      <div class="start-mission">
-        <p>Overcome the challenges threatening the A-Team.</p>
-        <p>Collect values, build your team, and survive all three levels to achieve mission success.</p>
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button
+          class="tab-btn"
+          :class="{ 'tab-btn--active': activeTab === 'mission' }"
+          @click="activeTab = 'mission'"
+        >MISSION</button>
+        <button
+          class="tab-btn"
+          :class="{ 'tab-btn--active': activeTab === 'guide' }"
+          @click="activeTab = 'guide'"
+        >GUIDE</button>
+        <button
+          class="tab-btn"
+          :class="{ 'tab-btn--active': activeTab === 'howtoplay' }"
+          @click="activeTab = 'howtoplay'"
+        >HOW TO PLAY</button>
       </div>
 
-      <div class="name-section">
-        <label class="name-label" for="player-name">Your Callsign</label>
-        <input
-          id="player-name"
-          v-model="playerName"
-          class="name-input"
-          type="text"
-          placeholder="Enter your name..."
-          maxlength="20"
-          @keydown.enter="handleStart"
-          autocomplete="off"
-          spellcheck="false"
-        />
-      </div>
-
-      <div class="controls-section">
-        <div class="controls-title">CONTROLS</div>
-        <div class="controls-grid">
-          <div class="control-row">
-            <div class="control-keys">
-              <span class="key">W</span>
-              <span class="key">A</span>
-              <span class="key">S</span>
-              <span class="key">D</span>
-              <span class="key-sep">or</span>
-              <span class="key arrow">↑</span>
-              <span class="key arrow">←</span>
-              <span class="key arrow">↓</span>
-              <span class="key arrow">→</span>
-            </div>
-            <span class="control-desc">Move</span>
-          </div>
-          <div class="control-row">
-            <div class="control-keys">
-              <span class="key wide">Auto</span>
-            </div>
-            <span class="control-desc">Fire — stay near enemies</span>
-          </div>
-          <div class="control-row">
-            <div class="control-keys">
-              <span class="key wide">Touch</span>
-            </div>
-            <span class="control-desc">Drag to move on mobile</span>
-          </div>
+      <!-- MISSION tab -->
+      <div v-show="activeTab === 'mission'" class="tab-panel">
+        <div class="mission-brief">
+          <p>Overcome the challenges threatening the A-Team.</p>
+          <p>Collect values, build your team, and survive all three levels to achieve mission success.</p>
         </div>
+
+        <div class="name-section">
+          <label class="name-label" for="player-name">Your Callsign</label>
+          <input
+            id="player-name"
+            v-model="playerName"
+            class="name-input"
+            type="text"
+            placeholder="Enter your name..."
+            maxlength="20"
+            @keydown.enter="handleStart"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+
+        <button
+          class="start-btn"
+          :class="{ pulse: !tapped }"
+          :disabled="tapped"
+          @click="handleStart"
+        >
+          {{ tapped ? 'Get Ready...' : 'LAUNCH MISSION' }}
+        </button>
+
+        <p class="controls-hint">WASD / arrows to move · auto-fires · touch to drag</p>
       </div>
 
-      <button
-        class="start-btn"
-        :class="{ pulse: !tapped }"
-        :disabled="tapped"
-        @click="handleStart"
-      >
-        {{ tapped ? 'Get Ready...' : 'LAUNCH MISSION' }}
-      </button>
-
-      <!-- Field guide toggle -->
-      <button class="field-guide-toggle" @click="fieldGuideOpen = !fieldGuideOpen">
-        📖 Field Guide
-        <span class="field-guide-chevron" :class="{ open: fieldGuideOpen }">▾</span>
-      </button>
-
-      <div class="field-guide-body" :class="{ open: fieldGuideOpen }">
+      <!-- FIELD GUIDE tab -->
+      <div v-show="activeTab === 'guide'" class="tab-panel">
         <!-- THREATS -->
         <div class="field-section">
           <div class="field-section-title">THREATS</div>
           <div class="threats-grid">
-            <div class="threat-card threat-common">
+            <div class="threat-card threat-card--common">
               <div class="threat-silhouette threat-silhouette--common"></div>
               <span class="threat-label">⚠ Workplace Challenge</span>
             </div>
-            <div class="threat-card threat-rare">
+            <div class="threat-card threat-card--rare">
               <div class="threat-silhouette threat-silhouette--rare"></div>
               <span class="threat-label">★ Rare Threat</span>
               <span class="threat-rarity-badge">RARE</span>
             </div>
-            <div class="threat-card threat-swarm">
+            <div class="threat-card threat-card--swarm">
               <div class="threat-silhouette threat-silhouette--swarm">
                 <span class="swarm-dot"></span>
                 <span class="swarm-dot"></span>
@@ -97,7 +85,7 @@
               </div>
               <span class="threat-label">🔔 Notification Swarm</span>
             </div>
-            <div class="threat-card threat-boss">
+            <div class="threat-card threat-card--boss">
               <div class="threat-silhouette threat-silhouette--boss"></div>
               <span class="threat-label threat-label--boss">⚠ THE UNKNOWN FUTURE</span>
             </div>
@@ -122,8 +110,44 @@
             </div>
           </div>
         </div>
+      </div>
 
-        <!-- TUTORIAL -->
+      <!-- HOW TO PLAY tab -->
+      <div v-show="activeTab === 'howtoplay'" class="tab-panel">
+        <!-- CONTROLS -->
+        <div class="field-section">
+          <div class="field-section-title">CONTROLS</div>
+          <div class="controls-block">
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">W</span>
+                <span class="key">A</span>
+                <span class="key">S</span>
+                <span class="key">D</span>
+                <span class="key-sep">or</span>
+                <span class="key arrow">↑</span>
+                <span class="key arrow">←</span>
+                <span class="key arrow">↓</span>
+                <span class="key arrow">→</span>
+              </div>
+              <span class="control-desc">Move</span>
+            </div>
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key key--wide">Auto</span>
+              </div>
+              <span class="control-desc">Fire — stay near enemies</span>
+            </div>
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key key--wide">Touch</span>
+              </div>
+              <span class="control-desc">Drag to move on mobile</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIPS -->
         <div class="field-section">
           <div class="field-section-title">HOW TO SURVIVE</div>
           <div class="tutorial-list">
@@ -177,7 +201,7 @@ import { POWERUP_TYPES } from '../game/constants.js'
 const emit = defineEmits(['start'])
 const tapped = ref(false)
 const playerName = ref('')
-const fieldGuideOpen = ref(false)
+const activeTab = ref('mission')
 
 const valueGuide = [
   { key: 'innovation', image: POWERUP_TYPES.innovation.image, name: POWERUP_TYPES.innovation.name, effect: POWERUP_TYPES.innovation.effect, cssColor: '#ffcc00' },
@@ -249,7 +273,51 @@ function handleStart() {
   margin: 0 0 18px;
 }
 
-.start-mission {
+/* ── Tab bar ── */
+.tab-bar {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #9B30FF33;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 2.5vw, 13px);
+  color: #666;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 4px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-btn:hover { color: #aaa; }
+
+.tab-btn--active {
+  color: #fff;
+  border-bottom-color: #9B30FF;
+  border-left: 2px solid #9B30FF;
+  background: #9B30FF11;
+}
+
+/* ── Tab panels ── */
+.tab-panel {
+  text-align: left;
+  animation: tab-fade-in 0.2s ease;
+}
+
+@keyframes tab-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── MISSION tab ── */
+.mission-brief {
   font-family: 'Courier New', monospace;
   font-size: clamp(10px, 2.8vw, 13px);
   color: #aaa;
@@ -259,15 +327,85 @@ function handleStart() {
   border-radius: 10px;
   padding: 12px 16px;
   background: #9B30FF0a;
+  text-align: center;
 }
 
-.start-mission p { margin: 0 0 4px; }
-.start-mission p:last-child { margin-bottom: 0; }
+.mission-brief p { margin: 0 0 4px; }
+.mission-brief p:last-child { margin-bottom: 0; }
+
+.controls-hint {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: #555;
+  text-align: center;
+  margin: 12px 0 0;
+  letter-spacing: 0.5px;
+}
+
+/* ── Name input ── */
+.name-section {
+  margin-bottom: 20px;
+}
+
+.name-label {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.5vw, 11px);
+  color: #cc44ff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.name-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(14px, 3.5vw, 18px);
+  color: #fff;
+  background: #ffffff0d;
+  border: 2px solid #9B30FF55;
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  letter-spacing: 1px;
+}
+
+.name-input::placeholder { color: #555; }
+.name-input:focus { border-color: #9B30FF; }
+
+/* ── Launch button ── */
+.start-btn {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(15px, 4vw, 22px);
+  color: #fff;
+  letter-spacing: 3px;
+  background: #9B30FF;
+  border: none;
+  border-radius: 40px;
+  padding: 14px 36px;
+  cursor: pointer;
+  box-shadow: 0 0 24px #9B30FF88;
+  transition: transform 0.15s;
+}
+
+.start-btn:disabled { opacity: 0.7; cursor: default; }
+.start-btn:not(:disabled):active { transform: scale(0.97); }
+
+.start-btn.pulse {
+  animation: pulse-btn 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse-btn {
+  0%, 100% { box-shadow: 0 0 24px #9B30FF88; transform: scale(1); }
+  50% { box-shadow: 0 0 48px #9B30FFcc; transform: scale(1.04); }
+}
 
 /* ── Field guide shared ── */
 .field-section {
   margin-bottom: 22px;
-  text-align: left;
 }
 
 .field-section-title {
@@ -374,7 +512,7 @@ function handleStart() {
 /* ── VALUES ── */
 .values-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
 
@@ -415,67 +553,20 @@ function handleStart() {
 
 .value-card-effect {
   font-family: 'Courier New', monospace;
-  font-size: clamp(8px, 1.8vw, 9px);
+  font-size: clamp(9px, 2vw, 11px);
   color: #666;
   line-height: 1.3;
 }
 
-/* ── Name input ── */
-.name-section {
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.name-label {
-  display: block;
-  font-family: 'Courier New', monospace;
-  font-size: clamp(9px, 2.5vw, 11px);
-  color: #cc44ff;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.name-input {
-  width: 100%;
-  box-sizing: border-box;
-  font-family: 'Courier New', monospace;
-  font-size: clamp(14px, 3.5vw, 18px);
-  color: #fff;
-  background: #ffffff0d;
-  border: 2px solid #9B30FF55;
-  border-radius: 8px;
-  padding: 10px 14px;
-  outline: none;
-  transition: border-color 0.2s;
-  letter-spacing: 1px;
-}
-
-.name-input::placeholder { color: #555; }
-.name-input:focus { border-color: #9B30FF; }
-
-/* ── Controls ── */
-.controls-section {
-  margin-bottom: 20px;
-  text-align: left;
+/* ── Controls (HOW TO PLAY tab) ── */
+.controls-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   background: #ffffff08;
   border: 1px solid #ffffff11;
   border-radius: 10px;
   padding: 14px 16px;
-}
-
-.controls-title {
-  font-family: 'Courier New', monospace;
-  font-size: clamp(9px, 2.5vw, 11px);
-  color: #cc44ff;
-  letter-spacing: 2px;
-  margin-bottom: 10px;
-}
-
-.controls-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
 .control-row {
@@ -507,7 +598,7 @@ function handleStart() {
   text-align: center;
 }
 
-.key.wide { min-width: 44px; }
+.key--wide { min-width: 44px; }
 
 .key-sep {
   font-family: 'Courier New', monospace;
@@ -520,84 +611,6 @@ function handleStart() {
   font-family: 'Courier New', monospace;
   font-size: clamp(10px, 2.5vw, 12px);
   color: #888;
-}
-
-/* ── Launch button ── */
-.start-btn {
-  font-family: 'Courier New', monospace;
-  font-size: clamp(15px, 4vw, 22px);
-  color: #fff;
-  letter-spacing: 3px;
-  background: #9B30FF;
-  border: none;
-  border-radius: 40px;
-  padding: 14px 36px;
-  cursor: pointer;
-  box-shadow: 0 0 24px #9B30FF88;
-  transition: transform 0.15s;
-}
-
-.start-btn:disabled { opacity: 0.7; cursor: default; }
-.start-btn:not(:disabled):active { transform: scale(0.97); }
-
-.start-btn.pulse {
-  animation: pulse-btn 1.2s ease-in-out infinite;
-}
-
-@keyframes pulse-btn {
-  0%, 100% { box-shadow: 0 0 24px #9B30FF88; transform: scale(1); }
-  50% { box-shadow: 0 0 48px #9B30FFcc; transform: scale(1.04); }
-}
-
-/* ── Field guide toggle + drawer ── */
-.field-guide-toggle {
-  width: 100%;
-  margin-top: 14px;
-  font-family: 'Courier New', monospace;
-  font-size: clamp(10px, 2.8vw, 12px);
-  color: #cc44ff;
-  background: transparent;
-  border: 1px solid #cc44ff33;
-  border-radius: 8px;
-  padding: 10px 16px;
-  cursor: pointer;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.field-guide-toggle:hover {
-  border-color: #cc44ff88;
-  background: #cc44ff0a;
-}
-
-.field-guide-chevron {
-  display: inline-block;
-  transition: transform 0.3s ease;
-  font-size: 12px;
-}
-
-.field-guide-chevron.open {
-  transform: rotate(180deg);
-}
-
-.field-guide-body {
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.4s ease, opacity 0.3s ease;
-  opacity: 0;
-}
-
-.field-guide-body.open {
-  max-height: 1400px;
-  opacity: 1;
-}
-
-.field-guide-body .field-section:first-child {
-  margin-top: 18px;
 }
 
 /* ── Tutorial ── */
@@ -651,9 +664,9 @@ function handleStart() {
   line-height: 1.5;
 }
 
-/* ── Mobile: collapse values to 2 columns ── */
+/* ── Mobile ── */
 @media (max-width: 400px) {
   .threats-grid { grid-template-columns: 1fr; }
-  .values-grid { grid-template-columns: 1fr 1fr; }
+  .values-grid { grid-template-columns: 1fr; }
 }
 </style>
