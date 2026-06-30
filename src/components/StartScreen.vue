@@ -22,6 +22,20 @@
 
       <!-- HOW TO PLAY tab -->
       <div v-show="activeTab === 'howtoplay'" class="tab-panel">
+        <!-- KEY TIPS grid -->
+        <div class="key-tips-grid">
+          <div class="key-tip-card">
+            <span class="key-tip-icon">💜</span>
+            <span class="key-tip-heading">Guard your capacity</span>
+            <span class="key-tip-body">You have 100 capacity. Enemies drain it on contact. Reach zero and it's game over.</span>
+          </div>
+          <div class="key-tip-card">
+            <span class="key-tip-icon">✨</span>
+            <span class="key-tip-heading">Collect values</span>
+            <span class="key-tip-body">Defeated enemies drop value orbs. Fly into them to unlock powerups.</span>
+          </div>
+        </div>
+
         <!-- CONTROLS -->
         <div class="field-section">
           <div class="field-section-title">CONTROLS</div>
@@ -45,34 +59,6 @@
                 <span class="key key--wide">Touch</span>
               </div>
               <span class="control-desc">Drag to move on mobile</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- TIPS -->
-        <div class="field-section">
-          <div class="field-section-title">HOW TO SURVIVE</div>
-          <div class="tutorial-list">
-            <div class="tutorial-item">
-              <span class="tutorial-icon">🕹</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Move to fire</span>
-                <span class="tutorial-body">Your ship auto-fires at the nearest enemy. Get close to deal damage.</span>
-              </div>
-            </div>
-            <div class="tutorial-item tutorial-item--key">
-              <span class="tutorial-icon">💜</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Guard your capacity</span>
-                <span class="tutorial-body">You have 100 capacity. Enemies drain it on contact. Reach zero and it's game over.</span>
-              </div>
-            </div>
-            <div class="tutorial-item tutorial-item--key">
-              <span class="tutorial-icon">✨</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Collect values</span>
-                <span class="tutorial-body">Defeated enemies drop value orbs. Fly into them to unlock powerups.</span>
-              </div>
             </div>
           </div>
         </div>
@@ -155,8 +141,6 @@
         >
           {{ tapped ? 'Get Ready...' : 'LAUNCH MISSION' }}
         </button>
-
-        <p class="controls-hint">WASD / arrows to move · auto-fires · touch to drag</p>
       </div>
     </div>
   </div>
@@ -506,6 +490,44 @@ function handleStart() {
   font-size: clamp(9px, 2vw, 11px);
   color: #666;
   line-height: 1.3;
+}
+
+/* ── Key tips grid (HOW TO PLAY top) ── */
+.key-tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.key-tip-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(155, 48, 255, 0.07);
+  border: 1px solid rgba(155, 48, 255, 0.35);
+  border-radius: 8px;
+  padding: 12px 10px;
+}
+
+.key-tip-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.key-tip-heading {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: bold;
+  color: #cc44ff;
+  letter-spacing: 0.5px;
+}
+
+.key-tip-body {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: #555;
+  line-height: 1.5;
 }
 
 /* ── Controls (HOW TO PLAY tab) ── */
