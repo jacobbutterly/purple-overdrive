@@ -25,7 +25,7 @@
         <!-- KEY TIPS grid -->
         <div class="key-tips-grid">
           <div class="key-tip-card">
-            <span class="key-tip-icon">💜</span>
+            <span class="key-tip-icon">🛡️</span>
             <span class="key-tip-heading">Guard your capacity</span>
             <span class="key-tip-body">You have 100 capacity. Enemies drain it on contact. Reach zero and it's game over.</span>
           </div>
@@ -52,7 +52,7 @@
                 <span class="key arrow">↓</span>
                 <span class="key arrow">→</span>
               </div>
-              <span class="control-desc">Move</span>
+              <span class="control-desc">Move to fire</span>
             </div>
             <div class="control-row">
               <div class="control-keys">
@@ -212,7 +212,7 @@ function handleStart() {
 .start-tagline {
   font-family: 'Courier New', monospace;
   font-size: clamp(10px, 2.8vw, 13px);
-  color: #666;
+  color: #fff;
   margin: 0 0 18px;
 }
 
@@ -418,7 +418,7 @@ function handleStart() {
 .threat-label {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2.2vw, 10px);
-  color: #aaa;
+  color: #fff;
   text-align: center;
   letter-spacing: 0.5px;
 }
@@ -488,7 +488,7 @@ function handleStart() {
 .value-card-effect {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2vw, 11px);
-  color: #666;
+  color: #fff;
   line-height: 1.3;
 }
 
@@ -503,6 +503,8 @@ function handleStart() {
 .key-tip-card {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 6px;
   background: rgba(155, 48, 255, 0.07);
   border: 1px solid rgba(155, 48, 255, 0.35);
@@ -526,7 +528,7 @@ function handleStart() {
 .key-tip-body {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2.2vw, 10px);
-  color: #555;
+  color: #fff;
   line-height: 1.5;
 }
 
@@ -582,7 +584,7 @@ function handleStart() {
 .control-desc {
   font-family: 'Courier New', monospace;
   font-size: clamp(10px, 2.5vw, 12px);
-  color: #888;
+  color: #fff;
 }
 
 /* ── Tutorial ── */
@@ -632,7 +634,7 @@ function handleStart() {
 .tutorial-body {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2.2vw, 10px);
-  color: #666;
+  color: #fff;
   line-height: 1.5;
 }
 
