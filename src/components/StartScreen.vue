@@ -114,7 +114,7 @@
               class="value-card"
               :style="{ borderLeftColor: v.cssColor }"
             >
-              <span class="value-card-icon">{{ v.icon }}</span>
+              <img :src="v.image" class="value-card-icon" :alt="v.name" />
               <div class="value-card-info">
                 <span class="value-card-name">{{ v.name }}</span>
                 <span class="value-card-effect">{{ v.effect }}</span>
@@ -138,12 +138,12 @@ const playerName = ref('')
 const fieldGuideOpen = ref(false)
 
 const valueGuide = [
-  { key: 'innovation', icon: POWERUP_TYPES.innovation.label, name: POWERUP_TYPES.innovation.name, effect: POWERUP_TYPES.innovation.effect, cssColor: '#ffcc00' },
-  { key: 'kindness',   icon: POWERUP_TYPES.kindness.label,   name: POWERUP_TYPES.kindness.name,   effect: POWERUP_TYPES.kindness.effect,   cssColor: '#44ff88' },
-  { key: 'teammate',   icon: POWERUP_TYPES.teammate.label,   name: POWERUP_TYPES.teammate.name,   effect: POWERUP_TYPES.teammate.effect,   cssColor: '#ff44cc' },
-  { key: 'integrity',  icon: POWERUP_TYPES.integrity.label,  name: POWERUP_TYPES.integrity.name,  effect: POWERUP_TYPES.integrity.effect,  cssColor: '#4488ff' },
-  { key: 'excellence', icon: POWERUP_TYPES.excellence.label, name: POWERUP_TYPES.excellence.name, effect: POWERUP_TYPES.excellence.effect, cssColor: '#ffdd00' },
-  { key: 'passion',    icon: POWERUP_TYPES.passion.label,    name: POWERUP_TYPES.passion.name,    effect: POWERUP_TYPES.passion.effect,    cssColor: '#ff4444' },
+  { key: 'innovation', image: POWERUP_TYPES.innovation.image, name: POWERUP_TYPES.innovation.name, effect: POWERUP_TYPES.innovation.effect, cssColor: '#ffcc00' },
+  { key: 'kindness',   image: POWERUP_TYPES.kindness.image,   name: POWERUP_TYPES.kindness.name,   effect: POWERUP_TYPES.kindness.effect,   cssColor: '#44ff88' },
+  { key: 'teammate',   image: POWERUP_TYPES.teammate.image,   name: POWERUP_TYPES.teammate.name,   effect: POWERUP_TYPES.teammate.effect,   cssColor: '#ff44cc' },
+  { key: 'integrity',  image: POWERUP_TYPES.integrity.image,  name: POWERUP_TYPES.integrity.name,  effect: POWERUP_TYPES.integrity.effect,  cssColor: '#4488ff' },
+  { key: 'excellence', image: POWERUP_TYPES.excellence.image, name: POWERUP_TYPES.excellence.name, effect: POWERUP_TYPES.excellence.effect, cssColor: '#ffdd00' },
+  { key: 'passion',    image: POWERUP_TYPES.passion.image,    name: POWERUP_TYPES.passion.name,    effect: POWERUP_TYPES.passion.effect,    cssColor: '#ff4444' },
 ]
 
 function handleStart() {
@@ -348,9 +348,10 @@ function handleStart() {
 }
 
 .value-card-icon {
-  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
   flex-shrink: 0;
-  line-height: 1;
 }
 
 .value-card-info {

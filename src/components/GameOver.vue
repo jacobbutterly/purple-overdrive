@@ -47,7 +47,7 @@
             :key="v.key"
             :style="{ animationDelay: `${0.15 + i * 0.1}s` }"
           >
-            <span class="stat-icon">{{ v.icon }}</span>
+            <img :src="v.image" class="stat-icon stat-icon--img" :alt="v.label" />
             <span class="stat-label">{{ v.label }}</span>
             <span class="value-bar-wrap">
               <span class="value-bar" :style="{ width: valueBarWidth(v.count) }" />
@@ -96,12 +96,12 @@ const downloading = ref(false)
 const formattedScore = computed(() => gameState.score.toLocaleString())
 
 const valueStats = computed(() => [
-  { key: 'innovation', icon: '💡', label: 'Innovation', count: gameState.valuesCollected.innovation },
-  { key: 'excellence', icon: '🏆', label: 'Excellence',  count: gameState.valuesCollected.excellence },
-  { key: 'teamwork',   icon: '👥', label: 'Teamwork',    count: gameState.valuesCollected.teamwork   },
-  { key: 'integrity',  icon: '💎', label: 'Integrity',   count: gameState.valuesCollected.integrity  },
-  { key: 'kindness',   icon: '💚', label: 'Kindness',    count: gameState.valuesCollected.kindness   },
-  { key: 'passion',    icon: '🔥', label: 'Passion',     count: gameState.valuesCollected.passion    },
+  { key: 'innovation', image: '/assets/images/innovation.png', label: 'Innovation', count: gameState.valuesCollected.innovation },
+  { key: 'excellence', image: '/assets/images/excellence.png', label: 'Excellence', count: gameState.valuesCollected.excellence },
+  { key: 'teamwork',   image: '/assets/images/teamwork.png',   label: 'Teamwork',   count: gameState.valuesCollected.teamwork   },
+  { key: 'integrity',  image: '/assets/images/integrity.png',  label: 'Integrity',  count: gameState.valuesCollected.integrity  },
+  { key: 'kindness',   image: '/assets/images/kindness.png',   label: 'Kindness',   count: gameState.valuesCollected.kindness   },
+  { key: 'passion',    image: '/assets/images/passion.png',    label: 'Passion',    count: gameState.valuesCollected.passion    },
 ])
 
 const maxCount = computed(() => Math.max(1, ...valueStats.value.map(v => v.count)))
@@ -420,6 +420,8 @@ function copyScorecard() {
 .victory .value-bar { background: #ffd700; }
 
 .stat-icon { font-size: 16px; width: 22px; flex-shrink: 0; }
+
+.stat-icon--img { width: 20px; height: 20px; object-fit: contain; font-size: unset; }
 
 .stat-label {
   width: 80px;
