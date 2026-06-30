@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { gameState, resetGameState } from '../../gameState.js'
-import { COLORS, TIMING, PLAYER, ENEMY_TYPES, POWERUP_TYPES, COMIC_TEXTS } from '../constants.js'
+import { COLORS, TIMING, PLAYER, ENEMY_TYPES, POWERUP_TYPES } from '../constants.js'
 import { JoystickSystem } from '../systems/JoystickSystem.js'
 import { AudioSystem } from '../systems/AudioSystem.js'
 import { level1Config } from '../levels/level1Config.js'
@@ -12,6 +12,16 @@ const LEVEL_CONFIGS = [null, level1Config, level2Config, level3Config]
 export class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' })
+  }
+
+  preload() {
+    const base = import.meta.env.BASE_URL
+    this.load.image('powerup_innovation', `${base}assets/images/innovation.png`)
+    this.load.image('powerup_kindness',   `${base}assets/images/kindness.png`)
+    this.load.image('powerup_teammate',   `${base}assets/images/teamwork.png`)
+    this.load.image('powerup_integrity',  `${base}assets/images/integrity.png`)
+    this.load.image('powerup_excellence', `${base}assets/images/excellence.png`)
+    this.load.image('powerup_passion',    `${base}assets/images/passion.png`)
   }
 
   create() {
@@ -146,10 +156,18 @@ export class GameScene extends Phaser.Scene {
       g.strokeCircle(this.player.x, this.player.y, this.player.radius + 6)
     }
 
-    // Integrity shield visual
+    // Integrity shield visual — layered pulsing rings
     if (gameState.hasIntegrity) {
-      g.lineStyle(2, COLORS.integrity, 0.6)
-      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 18)
+      const pulse = 0.55 + 0.3 * Math.sin(this.time.now * 0.004)
+      // Faint dome fill
+      g.fillStyle(COLORS.integrity, 0.07)
+      g.fillCircle(this.player.x, this.player.y, this.player.radius + 24)
+      // Outer ring
+      g.lineStyle(3, COLORS.integrity, pulse * 0.75)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 24)
+      // Inner ring
+      g.lineStyle(4, COLORS.integrity, pulse)
+      g.strokeCircle(this.player.x, this.player.y, this.player.radius + 14)
     }
 
     // Sync emoji position and facing direction
@@ -426,6 +444,8 @@ export class GameScene extends Phaser.Scene {
       tm.x = this.player.x + Math.cos(angle) * orbitR
       tm.y = this.player.y + Math.sin(angle) * orbitR
 
+      if (tm.txt) tm.txt.setPosition(tm.x, tm.y)
+
       // Draw teammate
       tm.gfx.clear()
       tm.gfx.fillStyle(COLORS.teammate, 0.9)
@@ -516,30 +536,26 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  _pickEnemyType(pool) {
-    let typeKey = pool[Math.floor(Math.random() * pool.length)]
-    const def = ENEMY_TYPES[typeKey]
-    if (def && def.isRare && Math.random() < 0.8) {
-      const commonPool = pool.filter(k => !ENEMY_TYPES[k]?.isRare)
-      if (commonPool.length > 0) {
-        typeKey = commonPool[Math.floor(Math.random() * commonPool.length)]
-      }
+  _pickEnemyDef(pool) {
+    let def = pool[Math.floor(Math.random() * pool.length)]
+    if (def.isRare && Math.random() < 0.8) {
+      const commonPool = pool.filter(d => !d.isRare)
+      if (commonPool.length > 0) def = commonPool[Math.floor(Math.random() * commonPool.length)]
     }
-    return typeKey
+    return def
   }
 
   _spawnEnemy() {
     const cfg = this.currentLevelConfig
     if (this.enemies.length >= cfg.maxEnemies) return
 
-    const typeKey = this._pickEnemyType(cfg.enemyPool)
-    const def = ENEMY_TYPES[typeKey]
+    const def = this._pickEnemyDef(cfg.enemyPool)
     if (!def) return
 
     if (def.isSwarm) { this._spawnNotificationSwarm(); return }
-    if (def.isLinked) { this._spawnLinkedPair(typeKey, def); return }
+    if (def.isLinked) { this._spawnLinkedPair(def); return }
 
-    this._spawnSingleEnemy(typeKey, def)
+    this._spawnSingleEnemy(def)
   }
 
   _edgeSpawnPos(def) {
@@ -550,7 +566,7 @@ export class GameScene extends Phaser.Scene {
     return { x: -def.w, y: Math.random() * this.H }
   }
 
-  _makeEnemy(typeKey, def, x, y, extra = {}) {
+  _makeEnemy(def, x, y, extra = {}) {
     const gfx = this.add.graphics()
     gfx.setDepth(5)
     const textStyle = {
@@ -562,10 +578,11 @@ export class GameScene extends Phaser.Scene {
     }
     const label = this.add.text(x, y, def.label, textStyle).setOrigin(0.5).setDepth(6)
     const enemy = {
-      key: typeKey, x, y,
+      name: def.name, x, y,
       w: def.w, h: def.h,
       hp: def.hp, maxHp: def.hp,
       speed: def.speed, score: def.score,
+      comicTexts: def.comicTexts,
       gfx, label,
       isBoss: !!def.isBoss,
       hitFlash: 0,
@@ -575,47 +592,44 @@ export class GameScene extends Phaser.Scene {
     return enemy
   }
 
-  _spawnSingleEnemy(typeKey, def) {
-    const def_ = def || ENEMY_TYPES[typeKey]
+  _spawnSingleEnemy(def) {
     let x, y
-    if (def_.isErratic) {
-      // Scope change spawns at a random interior point
+    if (def.isErratic) {
       const margin = 80
       x = margin + Math.random() * (this.W - margin * 2)
       y = margin + Math.random() * (this.H - margin * 2)
     } else {
-      const pos = this._edgeSpawnPos(def_)
+      const pos = this._edgeSpawnPos(def)
       x = pos.x; y = pos.y
     }
-    const extra = def_.isErratic ? { moveAngle: Math.random() * Math.PI * 2, moveTimer: 0 } : {}
-    const enemy = this._makeEnemy(typeKey, def_, x, y, extra)
+    const extra = def.isErratic ? { moveAngle: Math.random() * Math.PI * 2, moveTimer: 0 } : {}
+    const enemy = this._makeEnemy(def, x, y, extra)
     this.enemies.push(enemy)
   }
 
   _spawnNotificationSwarm() {
     this.audio.sfxSlackNotification()
-    const def = ENEMY_TYPES.notificationSpam
+    const def = ENEMY_TYPES.find(e => e.name === 'notificationSpam')
     const count = 5 + Math.floor(Math.random() * 3)
     for (let i = 0; i < count; i++) {
       if (this.enemies.length >= this.currentLevelConfig.maxEnemies) break
       const angle = (i / count) * Math.PI * 2
       const ex = this.W / 2 + Math.cos(angle) * (this.W * 0.6)
       const ey = this.H / 2 + Math.sin(angle) * (this.H * 0.6)
-      const enemy = this._makeEnemy('notificationSpam', def, ex, ey)
+      const enemy = this._makeEnemy(def, ex, ey)
       this.enemies.push(enemy)
     }
   }
 
-  _spawnLinkedPair(typeKey, def) {
+  _spawnLinkedPair(def) {
     if (this.enemies.length + 2 > this.currentLevelConfig.maxEnemies) return
     const posA = this._edgeSpawnPos(def)
-    // Spawn partner offset from A
     const posB = {
       x: Phaser.Math.Clamp(posA.x + (Math.random() > 0.5 ? 160 : -160), -def.w, this.W + def.w),
       y: Phaser.Math.Clamp(posA.y + (Math.random() > 0.5 ? 100 : -100), -def.h, this.H + def.h),
     }
-    const a = this._makeEnemy(typeKey, def, posA.x, posA.y)
-    const b = this._makeEnemy(typeKey, def, posB.x, posB.y)
+    const a = this._makeEnemy(def, posA.x, posA.y)
+    const b = this._makeEnemy(def, posB.x, posB.y)
     a.linkedTo = b
     b.linkedTo = a
     this.enemies.push(a, b)
@@ -626,7 +640,7 @@ export class GameScene extends Phaser.Scene {
     g.clear()
     const isFlashing = e.hitFlash > 0
 
-    if (e.key === 'notificationSpam') {
+    if (e.name === 'notificationSpam') {
       g.fillStyle(isFlashing ? 0xffffff : 0xff6600, 1)
       g.fillCircle(e.x, e.y, e.w / 2)
       g.lineStyle(2, 0xff9944, 1)
@@ -634,7 +648,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'scopeChange') {
+    if (e.name === 'scopeChange') {
       const fill = isFlashing ? 0xffffff : 0xff4400
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -651,8 +665,8 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'legacySpreadsheet' || e.key === 'todoFrom2014') {
-      const isTodo = e.key === 'todoFrom2014'
+    if (e.name === 'legacySpreadsheet' || e.name === 'todoFrom2014') {
+      const isTodo = e.name === 'todoFrom2014'
       const fillColor  = isTodo ? 0x3a2e0a : 0x1a4a1a
       const accentColor = isTodo ? 0xcc9922 : 0x44aa44
       const fill = isFlashing ? 0xffffff : fillColor
@@ -683,7 +697,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'githubOutage') {
+    if (e.name === 'githubOutage') {
       const fill = isFlashing ? 0xffffff : 0x3a0a0a
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -698,7 +712,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'llmFees') {
+    if (e.name === 'llmFees') {
       const fill = isFlashing ? 0xffffff : 0x3a2e00
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -717,7 +731,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'alwaysDns') {
+    if (e.name === 'alwaysDns') {
       const fill = isFlashing ? 0xffffff : 0x0a2a2a
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 6)
@@ -732,7 +746,7 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
-    if (e.key === 'doubleBooked') {
+    if (e.name === 'doubleBooked') {
       const fill = isFlashing ? 0xffffff : 0x1a3a5c
       g.fillStyle(fill, 1)
       g.fillRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
@@ -771,7 +785,7 @@ export class GameScene extends Phaser.Scene {
       const e = this.enemies[i]
 
       let angle
-      if (e.key === 'scopeChange') {
+      if (e.name === 'scopeChange') {
         // Erratic: change direction every 0.4-0.8s, bias toward player
         e.moveTimer = (e.moveTimer || 0) + dt
         if (e.moveTimer > 0.4 + Math.random() * 0.4) {
@@ -793,7 +807,7 @@ export class GameScene extends Phaser.Scene {
       e.label.y = e.y
       if (e.hitFlash > 0) e.hitFlash -= dt
 
-      if (e.key === 'alwaysDns') {
+      if (e.name === 'alwaysDns') {
         const blink = 0.55 + 0.45 * Math.sin(this.elapsedTime * Math.PI * 2)
         e.gfx.setAlpha(blink)
         e.label.setAlpha(blink)
@@ -814,12 +828,10 @@ export class GameScene extends Phaser.Scene {
     const gfx = this.add.graphics()
     gfx.setDepth(7)
 
-    const txt = this.add.text(x, y, def.label, {
-      fontSize: '20px',
-      align: 'center',
-    }).setOrigin(0.5).setDepth(8)
+    const img = this.add.image(x, y, `powerup_${typeKey}`)
+      .setOrigin(0.5).setDepth(8).setDisplaySize(30, 30)
 
-    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, txt, angle: 0, life: 12, collected: false }
+    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, img, angle: 0, life: 12, collected: false }
     this._drawPowerup(pu)
     this.powerups.push(pu)
     this.audio.sfxPowerupSpawn()
@@ -864,8 +876,7 @@ export class GameScene extends Phaser.Scene {
     // Inner lit background circle
     g.fillStyle(0xffffff, 0.18)
     g.fillCircle(pu.x, py, pu.size + 4)
-    // Sync emoji text
-    if (pu.txt) pu.txt.setPosition(pu.x, py)
+    if (pu.img) pu.img.setPosition(pu.x, py)
   }
 
   _updatePowerups(dt) {
@@ -877,7 +888,7 @@ export class GameScene extends Phaser.Scene {
       this._drawPowerup(pu)
       if (pu.life <= 0 || pu.collected) {
         pu.gfx.destroy()
-        if (pu.txt) pu.txt.destroy()
+        if (pu.img) pu.img.destroy()
         this.powerups.splice(i, 1)
       }
     }
@@ -954,15 +965,7 @@ export class GameScene extends Phaser.Scene {
   _collectPowerup(pu) {
     this.audio.sfxPowerup()
 
-    const VALUE_NAMES = {
-      innovation: 'Innovation',
-      kindness: 'Kindness',
-      teammate: 'Teamwork',
-      integrity: 'Integrity',
-      excellence: 'Excellence',
-      passion: 'Passion',
-    }
-    const valueName = VALUE_NAMES[pu.key]
+    const valueName = POWERUP_TYPES[pu.key]?.name
     if (valueName) this._showValueName(pu.x, pu.y, valueName, POWERUP_TYPES[pu.key].color)
 
     const countKey = pu.key === 'teammate' ? 'teamwork' : pu.key
@@ -977,7 +980,7 @@ export class GameScene extends Phaser.Scene {
           this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
         } else {
           this._triggerOverclock()
-          this._showFloatingText(pu.x, pu.y + 36, '💡 Overclock!', COLORS.innovation)
+          this._showFloatingText(pu.x, pu.y + 36, 'Overclock!', COLORS.innovation)
         }
         break
       case 'kindness':
@@ -987,8 +990,12 @@ export class GameScene extends Phaser.Scene {
       case 'teammate':
         if (gameState.teammateCount < 4) {
           gameState.teammateCount++
-          this.teammates.push({ x: this.player.x, y: this.player.y, gfx: this.add.graphics(), fireTimer: 0 })
-          this.teammates[this.teammates.length - 1].gfx.setDepth(9)
+          const tmGfx = this.add.graphics().setDepth(9)
+          const tmTxt = this.add.text(this.player.x, this.player.y, '👾', {
+            fontSize: '11px',
+            align: 'center',
+          }).setOrigin(0.5).setDepth(10)
+          this.teammates.push({ x: this.player.x, y: this.player.y, gfx: tmGfx, txt: tmTxt, fireTimer: 0 })
           this._showFloatingText(pu.x, pu.y + 36, 'Teammate Joined!', COLORS.teamwork)
         }
         break
@@ -998,11 +1005,11 @@ export class GameScene extends Phaser.Scene {
         break
       case 'excellence':
         gameState.streakMultiplier = Math.min(5, gameState.streakMultiplier + 1)
-        this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
+        this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× excellence!`, COLORS.excellence)
         break
       case 'passion':
         this._triggerPassion()
-        this._showFloatingText(pu.x, pu.y + 36, '🔥 Passion!', COLORS.passion)
+        this._showFloatingText(pu.x, pu.y + 36, 'Passion!', COLORS.passion)
         break
     }
   }
@@ -1042,7 +1049,7 @@ export class GameScene extends Phaser.Scene {
     gameState.score += pts
 
     // Comic text
-    const lines = COMIC_TEXTS[e.key] || ['Eliminated!']
+    const lines = e.comicTexts || ['Eliminated!']
     const txt = lines[Math.floor(Math.random() * lines.length)]
     this._showFloatingText(e.x, e.y - 20, txt, 0xffffff, true)
 
@@ -1062,6 +1069,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     if (e.isBoss) {
+      gameState.bossDefeated = true
       gameState.bossActive = false
       this._showBossDefeatedBanner()
       this.time.delayedCall(2200, () => this._endGame(true))
@@ -1158,13 +1166,13 @@ export class GameScene extends Phaser.Scene {
       this.streakChecked4x = true
       gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 4)
       gameState.bestStreak = Math.max(gameState.bestStreak, 4)
-      this._showFloatingText(this.player.x, this.player.y - 50, '4× Excellence!', COLORS.excellence)
+      this._showFloatingText(this.player.x, this.player.y - 50, '4× excellence!', COLORS.excellence)
     }
     if (this.timeSinceLastHit >= 60 && !this.streakChecked5x) {
       this.streakChecked5x = true
       gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 5)
       gameState.bestStreak = Math.max(gameState.bestStreak, 5)
-      this._showFloatingText(this.player.x, this.player.y - 50, '5× Excellence! UNSTOPPABLE!', COLORS.excellence)
+      this._showFloatingText(this.player.x, this.player.y - 50, '5× excellence! UNSTOPPABLE!', COLORS.excellence)
     }
   }
 
@@ -1175,7 +1183,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   _spawnBoss() {
-    const def = ENEMY_TYPES['theUnknownFuture']
+    const def = ENEMY_TYPES.find(e => e.name === 'theUnknownFuture')
     const x = this.W / 2
     const y = -def.h
 
@@ -1192,13 +1200,14 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(6)
 
     const boss = {
-      key: 'theUnknownFuture',
+      name: 'theUnknownFuture',
       x, y,
       w: def.w, h: def.h,
       hp: def.hp,
       maxHp: def.hp,
       speed: def.speed,
       score: def.score,
+      comicTexts: def.comicTexts,
       gfx, label,
       isBoss: true,
       hitFlash: 0,

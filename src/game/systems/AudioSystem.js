@@ -8,6 +8,7 @@ export class AudioSystem {
     this.currentBPM = 80
     this.running = false
     this.beat = 0
+    this.baseUrl = import.meta.env.BASE_URL || '/'
   }
 
   init() {
@@ -169,7 +170,7 @@ export class AudioSystem {
   }
 
   sfxSlackNotification() {
-    const audio = new Audio('/assets/audio/slack.mp3')
+    const audio = new Audio(`${this.baseUrl}assets/audio/slack.mp3`)
     audio.volume = 0.6
     audio.play().catch(() => {})
   }
