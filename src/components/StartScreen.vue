@@ -122,6 +122,48 @@
             </div>
           </div>
         </div>
+
+        <!-- TUTORIAL -->
+        <div class="field-section">
+          <div class="field-section-title">HOW TO SURVIVE</div>
+          <div class="tutorial-list">
+            <div class="tutorial-item">
+              <span class="tutorial-icon">🕹</span>
+              <div class="tutorial-text">
+                <span class="tutorial-heading">Move to fire</span>
+                <span class="tutorial-body">Your ship auto-fires at the nearest enemy. Get close to deal damage.</span>
+              </div>
+            </div>
+            <div class="tutorial-item">
+              <span class="tutorial-icon">💜</span>
+              <div class="tutorial-text">
+                <span class="tutorial-heading">Guard your capacity</span>
+                <span class="tutorial-body">You have 100 capacity. Enemies drain it on contact. Reach zero and it's game over.</span>
+              </div>
+            </div>
+            <div class="tutorial-item">
+              <span class="tutorial-icon">✨</span>
+              <div class="tutorial-text">
+                <span class="tutorial-heading">Collect values</span>
+                <span class="tutorial-body">Defeated enemies drop value orbs. Fly into them to unlock powerups.</span>
+              </div>
+            </div>
+            <div class="tutorial-item">
+              <span class="tutorial-icon">📈</span>
+              <div class="tutorial-text">
+                <span class="tutorial-heading">Three escalating levels</span>
+                <span class="tutorial-body">New, tougher threats appear at 1:00 and 2:00. Rare enemies emerge mid-game.</span>
+              </div>
+            </div>
+            <div class="tutorial-item tutorial-item--boss">
+              <span class="tutorial-icon">⚡</span>
+              <div class="tutorial-text">
+                <span class="tutorial-heading">Face The Unknown Future</span>
+                <span class="tutorial-body">The boss arrives in the final 15 seconds. Defeat it to achieve Master Complete.</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -550,12 +592,63 @@ function handleStart() {
 }
 
 .field-guide-body.open {
-  max-height: 900px;
+  max-height: 1400px;
   opacity: 1;
 }
 
 .field-guide-body .field-section:first-child {
   margin-top: 18px;
+}
+
+/* ── Tutorial ── */
+.tutorial-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tutorial-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.tutorial-item--boss {
+  border-color: rgba(255,153,0,0.25);
+  background: rgba(255,153,0,0.05);
+}
+
+.tutorial-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.tutorial-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tutorial-heading {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: bold;
+  color: #ddd;
+  letter-spacing: 0.5px;
+}
+
+.tutorial-item--boss .tutorial-heading { color: #ff9900; }
+
+.tutorial-body {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: #666;
+  line-height: 1.5;
 }
 
 /* ── Mobile: collapse values to 2 columns ── */
