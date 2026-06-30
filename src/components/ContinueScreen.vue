@@ -9,7 +9,7 @@
       </p>
 
       <div class="continue-boss-note" v-if="gameState.bossActive">
-        <span class="boss-pulse">⚠</span> The Unknown Future still looms!
+        <span class="boss-pulse">⚠</span> The VUCA World still looms!
       </div>
 
       <div class="continue-actions">

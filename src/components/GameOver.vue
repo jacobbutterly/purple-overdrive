@@ -9,7 +9,7 @@
         </div>
 
         <div v-if="gameState.bossDefeated" class="boss-defeated-badge">
-          ⚡ THE UNKNOWN FUTURE DEFEATED
+          ⚡ THE VUCA WORLD DEFEATED
         </div>
 
         <div v-if="gameState.playerName" class="player-greeting">
@@ -22,7 +22,7 @@
 
         <p class="gameover-sub">
           {{ gameState.bossDefeated
-            ? 'The Unknown Future has fallen. The A-Team secured the future.'
+            ? 'The VUCA World has fallen. The A-Team secured the future.'
             : gameState.victory
               ? 'You overcame every challenge. The A-Team surges on!'
               : 'The challenges were too great — but the team fights on.' }}
@@ -33,6 +33,12 @@
             <span class="stat-icon">🎯</span>
             <span class="stat-label">Score</span>
             <span class="stat-value">{{ formattedScore }}</span>
+          </div>
+
+          <div class="stat-row">
+            <span class="stat-icon">💀</span>
+            <span class="stat-label">Defeated</span>
+            <span class="stat-value">{{ gameState.enemiesDefeated }}</span>
           </div>
 
           <div class="values-header">
@@ -68,6 +74,9 @@
         <button class="download-btn" :class="{ downloading }" @click="downloadImage" :disabled="downloading">
           {{ downloading ? '⏳ Saving...' : '📸 Download Image' }}
         </button>
+        <button class="slack-btn" @click="openSlack">
+          💬 Share on Slack
+        </button>
         <button class="replay-btn" @click="$emit('restart')">
           ▶ Play Again
         </button>
@@ -76,7 +85,6 @@
         </button>
       </div>
 
-      <p class="gameover-hint">Share your score on Slack!</p>
       <p class="gameover-credit">Made by Jacob (with Builder) 🚀</p>
     </div>
   </div>
@@ -114,7 +122,7 @@ function valueBarWidth(count) {
 function buildScorecard() {
   const name = gameState.playerName || 'Agent'
   const outcome = gameState.bossDefeated
-    ? '🏆 MASTER COMPLETE — THE UNKNOWN FUTURE DEFEATED'
+    ? '🏆 MASTER COMPLETE — THE VUCA WORLD DEFEATED'
     : gameState.victory ? '✅ MISSION ACCOMPLISHED' : '❌ Game Over'
   const score = gameState.score.toLocaleString()
   const vc = gameState.valuesCollected
@@ -125,6 +133,7 @@ function buildScorecard() {
     outcome,
     '─────────────────────────────────',
     `🎯 Score:        ${score}`,
+    `💀 Defeated:     ${gameState.enemiesDefeated}`,
     '── Values Collected ──────────────',
     `💡 Innovation:   ${vc.innovation}×`,
     `🏆 excellence:   ${vc.excellence}×`,
@@ -133,7 +142,7 @@ function buildScorecard() {
     `💚 Kindness:     ${vc.kindness}×`,
     `🔥 Passion:      ${vc.passion}×`,
     '─────────────────────────────────',
-    ...(gameState.bossDefeated ? ['🏆 BOSS DEFEATED: The Unknown Future'] : []),
+    ...(gameState.bossDefeated ? ['🏆 BOSS DEFEATED: The VUCA World'] : []),
     'Can you beat this? 🚀 #PurpleOverdrive',
   ].join('\n')
 }
@@ -175,6 +184,10 @@ async function downloadImage() {
     })
     downloading.value = false
   }
+}
+
+function openSlack() {
+  window.open('https://slack.com/app_redirect?channel=purple-overdrive', '_blank')
 }
 
 function copyScorecard() {
@@ -448,7 +461,7 @@ function copyScorecard() {
   margin-bottom: 16px;
 }
 
-.copy-btn, .download-btn, .replay-btn, .home-btn {
+.copy-btn, .download-btn, .slack-btn, .replay-btn, .home-btn {
   font-family: 'Courier New', monospace;
   font-size: clamp(13px, 3.5vw, 16px);
   padding: 14px 24px;
@@ -489,6 +502,14 @@ function copyScorecard() {
 .download-btn:hover { border-color: #44ccff; }
 .download-btn:disabled { opacity: 0.6; cursor: default; }
 .download-btn.downloading { color: #888; border-color: #44444466; }
+
+.slack-btn {
+  background: transparent;
+  color: #4a9eff;
+  border: 2px solid #4a9eff55;
+}
+
+.slack-btn:hover { border-color: #4a9eff; }
 
 .replay-btn {
   background: transparent;

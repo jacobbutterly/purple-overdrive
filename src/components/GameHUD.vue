@@ -46,7 +46,7 @@
 
     <!-- Boss health bar -->
     <div v-if="gameState.bossActive" class="hud-boss-bar">
-      <div class="hud-boss-label">⚠ THE UNKNOWN FUTURE</div>
+      <div class="hud-boss-label">⚠ THE VUCA WORLD</div>
       <div class="hud-boss-track">
         <div class="hud-boss-fill" :style="{ width: bossHealthPct + '%' }"></div>
       </div>
@@ -76,10 +76,6 @@
             <span class="pause-sep">or</span>
             <span class="pause-key">↑ ← ↓ →</span>
             <span class="pause-action">Move</span>
-          </div>
-          <div class="pause-control-row">
-            <span class="pause-key">Auto</span>
-            <span class="pause-action">Fire (stay near enemies)</span>
           </div>
           <div class="pause-control-row">
             <span class="pause-key">P / Esc</span>
@@ -127,7 +123,8 @@ const healthBarColor = computed(() => {
 })
 
 const disruptionLabel = computed(() => {
-  return gameState.disruptionType === 'inverted' ? 'Controls Inverted!' : 'Weapons Offline!'
+  if (gameState.disruptionType === 'inverted') return 'Controls Inverted!'
+  return 'Rely on your teammates to help you!'
 })
 
 const bossHealthPct = computed(() => {

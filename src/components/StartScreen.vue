@@ -1,63 +1,67 @@
 <template>
   <div class="start-screen">
     <div class="start-content">
-      <!-- Shared header — always visible above tabs -->
+      <!-- Shared header -->
       <div class="start-logo">👾</div>
       <h1 class="start-title">Purple Overdrive</h1>
-      <p class="start-subtitle">A-Team Surge</p>
       <p class="start-tagline">3 Minutes. 3 Levels. One Team.</p>
 
       <!-- Tab bar -->
       <div class="tab-bar">
         <button
           class="tab-btn"
-          :class="{ 'tab-btn--active': activeTab === 'mission' }"
-          @click="activeTab = 'mission'"
-        >MISSION</button>
+          :class="{ 'tab-btn--active': activeTab === 'howtoplay' }"
+          @click="activeTab = 'howtoplay'"
+        >HOW TO PLAY</button>
         <button
           class="tab-btn"
           :class="{ 'tab-btn--active': activeTab === 'guide' }"
           @click="activeTab = 'guide'"
-        >GUIDE</button>
-        <button
-          class="tab-btn"
-          :class="{ 'tab-btn--active': activeTab === 'howtoplay' }"
-          @click="activeTab = 'howtoplay'"
-        >HOW TO PLAY</button>
+        >FIELD GUIDE</button>
       </div>
 
-      <!-- MISSION tab -->
-      <div v-show="activeTab === 'mission'" class="tab-panel">
-        <div class="mission-brief">
-          <p>Overcome the challenges threatening the A-Team.</p>
-          <p>Collect values, build your team, and survive all three levels to achieve mission success.</p>
+      <!-- HOW TO PLAY tab -->
+      <div v-show="activeTab === 'howtoplay'" class="tab-panel">
+        <!-- KEY TIPS grid -->
+        <div class="key-tips-grid">
+          <div class="key-tip-card">
+            <span class="key-tip-icon">🛡️</span>
+            <span class="key-tip-heading">Guard your capacity</span>
+            <span class="key-tip-body">You have 100 capacity. Enemies drain it on contact. Reach zero and it's game over.</span>
+          </div>
+          <div class="key-tip-card">
+            <span class="key-tip-icon">✨</span>
+            <span class="key-tip-heading">Collect values</span>
+            <span class="key-tip-body">Defeated enemies drop value orbs. Fly into them to unlock powerups.</span>
+          </div>
         </div>
 
-        <div class="name-section">
-          <label class="name-label" for="player-name">Your Callsign</label>
-          <input
-            id="player-name"
-            v-model="playerName"
-            class="name-input"
-            type="text"
-            placeholder="Enter your name..."
-            maxlength="20"
-            @keydown.enter="handleStart"
-            autocomplete="off"
-            spellcheck="false"
-          />
+        <!-- CONTROLS -->
+        <div class="field-section">
+          <div class="field-section-title">CONTROLS</div>
+          <div class="controls-block">
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key">W</span>
+                <span class="key">A</span>
+                <span class="key">S</span>
+                <span class="key">D</span>
+                <span class="key-sep">or</span>
+                <span class="key arrow">↑</span>
+                <span class="key arrow">←</span>
+                <span class="key arrow">↓</span>
+                <span class="key arrow">→</span>
+              </div>
+              <span class="control-desc">Move to fire</span>
+            </div>
+            <div class="control-row">
+              <div class="control-keys">
+                <span class="key key--wide">Touch</span>
+              </div>
+              <span class="control-desc">Drag to move on mobile</span>
+            </div>
+          </div>
         </div>
-
-        <button
-          class="start-btn"
-          :class="{ pulse: !tapped }"
-          :disabled="tapped"
-          @click="handleStart"
-        >
-          {{ tapped ? 'Get Ready...' : 'LAUNCH MISSION' }}
-        </button>
-
-        <p class="controls-hint">WASD / arrows to move · auto-fires · touch to drag</p>
       </div>
 
       <!-- FIELD GUIDE tab -->
@@ -68,11 +72,11 @@
           <div class="threats-grid">
             <div class="threat-card threat-card--common">
               <div class="threat-silhouette threat-silhouette--common"></div>
-              <span class="threat-label">⚠ Workplace Challenge</span>
+              <span class="threat-label">⚠ Everyday Disruption</span>
             </div>
             <div class="threat-card threat-card--rare">
               <div class="threat-silhouette threat-silhouette--rare"></div>
-              <span class="threat-label">★ Rare Threat</span>
+              <span class="threat-label">★ Critical Threat</span>
               <span class="threat-rarity-badge">RARE</span>
             </div>
             <div class="threat-card threat-card--swarm">
@@ -87,7 +91,7 @@
             </div>
             <div class="threat-card threat-card--boss">
               <div class="threat-silhouette threat-silhouette--boss"></div>
-              <span class="threat-label threat-label--boss">⚠ THE UNKNOWN FUTURE</span>
+              <span class="threat-label threat-label--boss">⚠ THE VUCA WORLD</span>
             </div>
           </div>
         </div>
@@ -112,82 +116,31 @@
         </div>
       </div>
 
-      <!-- HOW TO PLAY tab -->
-      <div v-show="activeTab === 'howtoplay'" class="tab-panel">
-        <!-- CONTROLS -->
-        <div class="field-section">
-          <div class="field-section-title">CONTROLS</div>
-          <div class="controls-block">
-            <div class="control-row">
-              <div class="control-keys">
-                <span class="key">W</span>
-                <span class="key">A</span>
-                <span class="key">S</span>
-                <span class="key">D</span>
-                <span class="key-sep">or</span>
-                <span class="key arrow">↑</span>
-                <span class="key arrow">←</span>
-                <span class="key arrow">↓</span>
-                <span class="key arrow">→</span>
-              </div>
-              <span class="control-desc">Move</span>
-            </div>
-            <div class="control-row">
-              <div class="control-keys">
-                <span class="key key--wide">Auto</span>
-              </div>
-              <span class="control-desc">Fire — stay near enemies</span>
-            </div>
-            <div class="control-row">
-              <div class="control-keys">
-                <span class="key key--wide">Touch</span>
-              </div>
-              <span class="control-desc">Drag to move on mobile</span>
-            </div>
-          </div>
+      <!-- Always-visible launch section -->
+      <div class="launch-section">
+        <div class="name-section">
+          <label class="name-label" for="player-name">Your Callsign</label>
+          <input
+            id="player-name"
+            v-model="playerName"
+            class="name-input"
+            type="text"
+            placeholder="Enter your name..."
+            maxlength="20"
+            @keydown.enter="handleStart"
+            autocomplete="off"
+            spellcheck="false"
+          />
         </div>
 
-        <!-- TIPS -->
-        <div class="field-section">
-          <div class="field-section-title">HOW TO SURVIVE</div>
-          <div class="tutorial-list">
-            <div class="tutorial-item">
-              <span class="tutorial-icon">🕹</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Move to fire</span>
-                <span class="tutorial-body">Your ship auto-fires at the nearest enemy. Get close to deal damage.</span>
-              </div>
-            </div>
-            <div class="tutorial-item">
-              <span class="tutorial-icon">💜</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Guard your capacity</span>
-                <span class="tutorial-body">You have 100 capacity. Enemies drain it on contact. Reach zero and it's game over.</span>
-              </div>
-            </div>
-            <div class="tutorial-item">
-              <span class="tutorial-icon">✨</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Collect values</span>
-                <span class="tutorial-body">Defeated enemies drop value orbs. Fly into them to unlock powerups.</span>
-              </div>
-            </div>
-            <div class="tutorial-item">
-              <span class="tutorial-icon">📈</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Three escalating levels</span>
-                <span class="tutorial-body">New, tougher threats appear at 1:00 and 2:00. Rare enemies emerge mid-game.</span>
-              </div>
-            </div>
-            <div class="tutorial-item tutorial-item--boss">
-              <span class="tutorial-icon">⚡</span>
-              <div class="tutorial-text">
-                <span class="tutorial-heading">Face The Unknown Future</span>
-                <span class="tutorial-body">The boss arrives in the final 15 seconds. Defeat it to achieve Master Complete.</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <button
+          class="start-btn"
+          :class="{ pulse: !tapped }"
+          :disabled="tapped"
+          @click="handleStart"
+        >
+          {{ tapped ? 'Get Ready...' : 'LAUNCH MISSION' }}
+        </button>
       </div>
     </div>
   </div>
@@ -201,7 +154,7 @@ import { POWERUP_TYPES } from '../game/constants.js'
 const emit = defineEmits(['start'])
 const tapped = ref(false)
 const playerName = ref('')
-const activeTab = ref('mission')
+const activeTab = ref('howtoplay')
 
 const valueGuide = [
   { key: 'innovation', image: POWERUP_TYPES.innovation.image, name: POWERUP_TYPES.innovation.name, effect: POWERUP_TYPES.innovation.effect, cssColor: '#ffcc00' },
@@ -256,20 +209,10 @@ function handleStart() {
   text-transform: uppercase;
 }
 
-.start-subtitle {
-  font-family: 'Courier New', monospace;
-  font-size: clamp(13px, 4vw, 18px);
-  color: #ff44cc;
-  text-shadow: 0 0 12px #ff44cc88;
-  margin: 0 0 4px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-}
-
 .start-tagline {
   font-family: 'Courier New', monospace;
   font-size: clamp(10px, 2.8vw, 13px);
-  color: #666;
+  color: #fff;
   margin: 0 0 18px;
 }
 
@@ -316,22 +259,12 @@ function handleStart() {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── MISSION tab ── */
-.mission-brief {
-  font-family: 'Courier New', monospace;
-  font-size: clamp(10px, 2.8vw, 13px);
-  color: #aaa;
-  line-height: 1.6;
-  margin-bottom: 22px;
-  border: 1px solid #9B30FF33;
-  border-radius: 10px;
-  padding: 12px 16px;
-  background: #9B30FF0a;
-  text-align: center;
+/* ── Launch section (always visible) ── */
+.launch-section {
+  margin-top: 24px;
+  border-top: 1px solid #9B30FF22;
+  padding-top: 20px;
 }
-
-.mission-brief p { margin: 0 0 4px; }
-.mission-brief p:last-child { margin-bottom: 0; }
 
 .controls-hint {
   font-family: 'Courier New', monospace;
@@ -355,6 +288,7 @@ function handleStart() {
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 6px;
+  text-align: left;
 }
 
 .name-input {
@@ -484,7 +418,7 @@ function handleStart() {
 .threat-label {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2.2vw, 10px);
-  color: #aaa;
+  color: #fff;
   text-align: center;
   letter-spacing: 0.5px;
 }
@@ -554,8 +488,48 @@ function handleStart() {
 .value-card-effect {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2vw, 11px);
-  color: #666;
+  color: #fff;
   line-height: 1.3;
+}
+
+/* ── Key tips grid (HOW TO PLAY top) ── */
+.key-tips-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.key-tip-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  background: rgba(155, 48, 255, 0.07);
+  border: 1px solid rgba(155, 48, 255, 0.35);
+  border-radius: 8px;
+  padding: 12px 10px;
+}
+
+.key-tip-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.key-tip-heading {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 2.5vw, 12px);
+  font-weight: bold;
+  color: #cc44ff;
+  letter-spacing: 0.5px;
+}
+
+.key-tip-body {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 2.2vw, 10px);
+  color: #fff;
+  line-height: 1.5;
 }
 
 /* ── Controls (HOW TO PLAY tab) ── */
@@ -610,7 +584,7 @@ function handleStart() {
 .control-desc {
   font-family: 'Courier New', monospace;
   font-size: clamp(10px, 2.5vw, 12px);
-  color: #888;
+  color: #fff;
 }
 
 /* ── Tutorial ── */
@@ -630,9 +604,9 @@ function handleStart() {
   padding: 10px 12px;
 }
 
-.tutorial-item--boss {
-  border-color: rgba(255,153,0,0.25);
-  background: rgba(255,153,0,0.05);
+.tutorial-item--key {
+  border-color: rgba(155, 48, 255, 0.35);
+  background: rgba(155, 48, 255, 0.07);
 }
 
 .tutorial-icon {
@@ -655,12 +629,12 @@ function handleStart() {
   letter-spacing: 0.5px;
 }
 
-.tutorial-item--boss .tutorial-heading { color: #ff9900; }
+.tutorial-item--key .tutorial-heading { color: #cc44ff; }
 
 .tutorial-body {
   font-family: 'Courier New', monospace;
   font-size: clamp(9px, 2.2vw, 10px);
-  color: #666;
+  color: #fff;
   line-height: 1.5;
 }
 

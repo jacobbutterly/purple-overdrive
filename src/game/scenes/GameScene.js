@@ -170,6 +170,15 @@ export class GameScene extends Phaser.Scene {
       g.strokeCircle(this.player.x, this.player.y, this.player.radius + 14)
     }
 
+    // Tier 3 diffusion aura ring — visualises the invisible damage radius
+    if (gameState.weaponTier >= 3) {
+      const pulse = 0.25 + 0.2 * Math.sin(this.elapsedTime * 7)
+      g.lineStyle(2, 0xff9900, pulse)
+      g.strokeCircle(this.player.x, this.player.y, 80)
+      g.fillStyle(0xff9900, pulse * 0.12)
+      g.fillCircle(this.player.x, this.player.y, 80)
+    }
+
     // Sync emoji position and facing direction
     this.player.emoji.setPosition(this.player.x, this.player.y)
     this.player.emoji.setScale(this.playerFacingLeft ? -1 : 1, 1)
@@ -448,9 +457,9 @@ export class GameScene extends Phaser.Scene {
 
       // Draw teammate
       tm.gfx.clear()
-      tm.gfx.fillStyle(COLORS.teammate, 0.9)
+      tm.gfx.fillStyle(COLORS.playerGlow, 1)
       tm.gfx.fillCircle(tm.x, tm.y, 10)
-      tm.gfx.lineStyle(2, 0xffffff, 0.5)
+      tm.gfx.lineStyle(2, 0xffffff, 0.85)
       tm.gfx.strokeCircle(tm.x, tm.y, 10)
 
       // Teammate auto-fire
@@ -513,11 +522,22 @@ export class GameScene extends Phaser.Scene {
   _fireProjectile(x, y, vx, vy, color, dmg) {
     const gfx = this.add.graphics()
     gfx.setDepth(8)
-    gfx.fillStyle(color, 1)
-    gfx.fillRect(-4, -2, 8, 4)
+
+    const isPlayerShot = color === COLORS.projectile
+    const tier = isPlayerShot ? gameState.weaponTier : -1
+    const tierColors = [0x00ffff, 0xffff44, 0xcc44ff, 0xff9900]
+    const drawColor = isPlayerShot ? tierColors[tier] : color
+
+    gfx.fillStyle(drawColor, 1)
+    if (tier === 1) {
+      gfx.fillRect(-11, -1.5, 22, 3)
+    } else {
+      gfx.fillRect(-5, -2, 10, 4)
+    }
+    gfx.rotation = Math.atan2(vy, vx)
+
     gfx.x = x
     gfx.y = y
-
     this.projectiles.push({ x, y, vx, vy, gfx, dmg: dmg || 1, life: 2 })
   }
 
@@ -555,6 +575,7 @@ export class GameScene extends Phaser.Scene {
     if (def.isSwarm) { this._spawnNotificationSwarm(); return }
     if (def.isLinked) { this._spawnLinkedPair(def); return }
 
+    if (def.name === 'smsNotification') this.audio.sfxMessageNotification()
     this._spawnSingleEnemy(def)
   }
 
@@ -648,6 +669,14 @@ export class GameScene extends Phaser.Scene {
       return
     }
 
+    if (e.name === 'smsNotification') {
+      g.fillStyle(isFlashing ? 0xffffff : 0x2288ff, 1)
+      g.fillCircle(e.x, e.y, e.w / 2)
+      g.lineStyle(2, 0x66aaff, 1)
+      g.strokeCircle(e.x, e.y, e.w / 2)
+      return
+    }
+
     if (e.name === 'scopeChange') {
       const fill = isFlashing ? 0xffffff : 0xff4400
       g.fillStyle(fill, 1)
@@ -709,6 +738,15 @@ export class GameScene extends Phaser.Scene {
         g.lineBetween(e.x - hw + 6, e.y - hh + 6, e.x + hw - 6, e.y + hh - 6)
         g.lineBetween(e.x + hw - 6, e.y - hh + 6, e.x - hw + 6, e.y + hh - 6)
       }
+      const barW = e.w - 8
+      const barH = 5
+      const bx = e.x - barW / 2
+      const by = e.y + e.h / 2 + 4
+      const pct = e.hp / e.maxHp
+      g.fillStyle(0x333333, 1)
+      g.fillRect(bx, by, barW, barH)
+      g.fillStyle(0xaaaaaa, 1)
+      g.fillRect(bx, by, barW * pct, barH)
       return
     }
 
@@ -767,7 +805,7 @@ export class GameScene extends Phaser.Scene {
     g.lineStyle(e.isBoss ? 3 : 2, strokeColor, 1)
     g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
 
-    if (e.isBoss && e.maxHp > 10) {
+    if (e.maxHp >= 10) {
       const barW = e.w - 10
       const barH = 6
       const bx = e.x - barW / 2
@@ -775,7 +813,7 @@ export class GameScene extends Phaser.Scene {
       const pct = e.hp / e.maxHp
       g.fillStyle(0x444444, 1)
       g.fillRect(bx, by, barW, barH)
-      g.fillStyle(0xff4444, 1)
+      g.fillStyle(e.isBoss ? 0xff4444 : 0xaaaaaa, 1)
       g.fillRect(bx, by, barW * pct, barH)
     }
   }
@@ -1047,6 +1085,7 @@ export class GameScene extends Phaser.Scene {
   _killEnemy(e) {
     const pts = e.score * gameState.streakMultiplier
     gameState.score += pts
+    gameState.enemiesDefeated++
 
     // Comic text
     const lines = e.comicTexts || ['Eliminated!']
@@ -1225,7 +1264,7 @@ export class GameScene extends Phaser.Scene {
     bg.fillStyle(0xff0000, 0.7)
     bg.fillRect(0, this.H / 2 - 55, this.W, 110)
     bg.setDepth(88)
-    const txt = this.add.text(this.W / 2, this.H / 2, '⚠ THE UNKNOWN FUTURE APPROACHES!', {
+    const txt = this.add.text(this.W / 2, this.H / 2, '⚠ THE VUCA WORLD APPROACHES!', {
       fontFamily: 'Courier New',
       fontSize: Math.min(this.W * 0.048, 20) + 'px',
       color: '#ffffff',
@@ -1251,7 +1290,7 @@ export class GameScene extends Phaser.Scene {
     bg.fillRect(0, this.H / 2 - 65, this.W, 130)
     bg.setDepth(92)
 
-    const txt = this.add.text(this.W / 2, this.H / 2, '🏆 THE UNKNOWN FUTURE DEFEATED!\nMISSION ACCOMPLISHED!', {
+    const txt = this.add.text(this.W / 2, this.H / 2, '🏆 THE VUCA WORLD DEFEATED!\nMISSION ACCOMPLISHED!', {
       fontFamily: 'Courier New',
       fontSize: Math.min(this.W * 0.048, 20) + 'px',
       color: '#000000',
