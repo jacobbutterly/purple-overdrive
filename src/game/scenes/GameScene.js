@@ -170,6 +170,15 @@ export class GameScene extends Phaser.Scene {
       g.strokeCircle(this.player.x, this.player.y, this.player.radius + 14)
     }
 
+    // Tier 3 diffusion aura ring — visualises the invisible damage radius
+    if (gameState.weaponTier >= 3) {
+      const pulse = 0.25 + 0.2 * Math.sin(this.elapsedTime * 7)
+      g.lineStyle(2, 0xff9900, pulse)
+      g.strokeCircle(this.player.x, this.player.y, 80)
+      g.fillStyle(0xff9900, pulse * 0.12)
+      g.fillCircle(this.player.x, this.player.y, 80)
+    }
+
     // Sync emoji position and facing direction
     this.player.emoji.setPosition(this.player.x, this.player.y)
     this.player.emoji.setScale(this.playerFacingLeft ? -1 : 1, 1)
@@ -513,11 +522,28 @@ export class GameScene extends Phaser.Scene {
   _fireProjectile(x, y, vx, vy, color, dmg) {
     const gfx = this.add.graphics()
     gfx.setDepth(8)
-    gfx.fillStyle(color, 1)
-    gfx.fillRect(-4, -2, 8, 4)
+
+    const isPlayerShot = color === COLORS.projectile
+    const tier = isPlayerShot ? gameState.weaponTier : -1
+    const tierColors = [0x00ffff, 0xffff44, 0xcc44ff, 0xff9900]
+    const drawColor = isPlayerShot ? tierColors[tier] : color
+
+    gfx.fillStyle(drawColor, 1)
+    if (tier === 1) {
+      gfx.fillRect(-11, -1.5, 22, 3)
+    } else if (tier === 2) {
+      gfx.fillCircle(0, 0, 5)
+    } else if (tier === 3) {
+      gfx.fillStyle(drawColor, 0.35)
+      gfx.fillCircle(0, 0, 9)
+      gfx.fillStyle(drawColor, 1)
+      gfx.fillCircle(0, 0, 5)
+    } else {
+      gfx.fillRect(-5, -2, 10, 4)
+    }
+
     gfx.x = x
     gfx.y = y
-
     this.projectiles.push({ x, y, vx, vy, gfx, dmg: dmg || 1, life: 2 })
   }
 
