@@ -555,6 +555,7 @@ export class GameScene extends Phaser.Scene {
     if (def.isSwarm) { this._spawnNotificationSwarm(); return }
     if (def.isLinked) { this._spawnLinkedPair(def); return }
 
+    if (def.name === 'smsNotification') this.audio.sfxMessageNotification()
     this._spawnSingleEnemy(def)
   }
 
@@ -644,6 +645,14 @@ export class GameScene extends Phaser.Scene {
       g.fillStyle(isFlashing ? 0xffffff : 0xff6600, 1)
       g.fillCircle(e.x, e.y, e.w / 2)
       g.lineStyle(2, 0xff9944, 1)
+      g.strokeCircle(e.x, e.y, e.w / 2)
+      return
+    }
+
+    if (e.name === 'smsNotification') {
+      g.fillStyle(isFlashing ? 0xffffff : 0x2288ff, 1)
+      g.fillCircle(e.x, e.y, e.w / 2)
+      g.lineStyle(2, 0x66aaff, 1)
       g.strokeCircle(e.x, e.y, e.w / 2)
       return
     }

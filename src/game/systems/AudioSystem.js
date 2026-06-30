@@ -175,6 +175,12 @@ export class AudioSystem {
     audio.play().catch(() => {})
   }
 
+  sfxMessageNotification() {
+    const audio = new Audio(`${this.baseUrl}assets/audio/message.mp3`)
+    audio.volume = 0.6
+    audio.play().catch(() => {})
+  }
+
   sfxPassion() {
     if (!this.ctx) return
     const now = this.ctx.currentTime

@@ -68,6 +68,9 @@
         <button class="download-btn" :class="{ downloading }" @click="downloadImage" :disabled="downloading">
           {{ downloading ? '⏳ Saving...' : '📸 Download Image' }}
         </button>
+        <button class="slack-btn" @click="openSlack">
+          💬 Share on Slack
+        </button>
         <button class="replay-btn" @click="$emit('restart')">
           ▶ Play Again
         </button>
@@ -76,7 +79,6 @@
         </button>
       </div>
 
-      <p class="gameover-hint">Share your score on Slack!</p>
       <p class="gameover-credit">Made by Jacob (with Builder) 🚀</p>
     </div>
   </div>
@@ -175,6 +177,10 @@ async function downloadImage() {
     })
     downloading.value = false
   }
+}
+
+function openSlack() {
+  window.open('https://slack.com/app_redirect?channel=purple-overdrive', '_blank')
 }
 
 function copyScorecard() {
@@ -489,6 +495,14 @@ function copyScorecard() {
 .download-btn:hover { border-color: #44ccff; }
 .download-btn:disabled { opacity: 0.6; cursor: default; }
 .download-btn.downloading { color: #888; border-color: #44444466; }
+
+.slack-btn {
+  background: transparent;
+  color: #4a9eff;
+  border: 2px solid #4a9eff55;
+}
+
+.slack-btn:hover { border-color: #4a9eff; }
 
 .replay-btn {
   background: transparent;

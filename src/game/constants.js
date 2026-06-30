@@ -145,6 +145,11 @@ export const ENEMY_TYPES = [
     comicTexts: ['Muted!', 'Do Not Disturb!', 'Silenced!'],
   },
   {
+    name: 'smsNotification', label: '💬', rarity: 'rare',
+    level: 2, w: 38, h: 38, hp: 2, speed: 160, score: 20, isRare: true,
+    comicTexts: ['Read!', 'Replied!', 'On Read!'],
+  },
+  {
     name: 'doubleBooked', label: '📅 Double\nBooked', rarity: 'rare',
     level: 2, w: 88, h: 58, hp: 6, speed: 42, score: 80, isLinked: true, isRare: true,
     comicTexts: ['Calendar Cleared!', 'Time Reclaimed!', 'Where was I?'],
