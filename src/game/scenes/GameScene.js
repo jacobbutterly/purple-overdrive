@@ -15,12 +15,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('powerup_innovation', '/assets/images/innovation.png')
-    this.load.image('powerup_kindness',   '/assets/images/kindness.png')
-    this.load.image('powerup_teammate',   '/assets/images/teamwork.png')
-    this.load.image('powerup_integrity',  '/assets/images/integrity.png')
-    this.load.image('powerup_excellence', '/assets/images/excellence.png')
-    this.load.image('powerup_passion',    '/assets/images/passion.png')
+    const base = import.meta.env.BASE_URL
+    this.load.image('powerup_innovation', `${base}assets/images/innovation.png`)
+    this.load.image('powerup_kindness',   `${base}assets/images/kindness.png`)
+    this.load.image('powerup_teammate',   `${base}assets/images/teamwork.png`)
+    this.load.image('powerup_integrity',  `${base}assets/images/integrity.png`)
+    this.load.image('powerup_excellence', `${base}assets/images/excellence.png`)
+    this.load.image('powerup_passion',    `${base}assets/images/passion.png`)
   }
 
   create() {

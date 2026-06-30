@@ -95,13 +95,14 @@ const downloading = ref(false)
 
 const formattedScore = computed(() => gameState.score.toLocaleString())
 
+const base = import.meta.env.BASE_URL
 const valueStats = computed(() => [
-  { key: 'innovation', image: '/assets/images/innovation.png', label: 'Innovation', count: gameState.valuesCollected.innovation },
-  { key: 'excellence', image: '/assets/images/excellence.png', label: 'Excellence', count: gameState.valuesCollected.excellence },
-  { key: 'teamwork',   image: '/assets/images/teamwork.png',   label: 'Teamwork',   count: gameState.valuesCollected.teamwork   },
-  { key: 'integrity',  image: '/assets/images/integrity.png',  label: 'Integrity',  count: gameState.valuesCollected.integrity  },
-  { key: 'kindness',   image: '/assets/images/kindness.png',   label: 'Kindness',   count: gameState.valuesCollected.kindness   },
-  { key: 'passion',    image: '/assets/images/passion.png',    label: 'Passion',    count: gameState.valuesCollected.passion    },
+  { key: 'innovation', image: `${base}assets/images/innovation.png`, label: 'Innovation', count: gameState.valuesCollected.innovation },
+  { key: 'excellence', image: `${base}assets/images/excellence.png`, label: 'excellence', count: gameState.valuesCollected.excellence },
+  { key: 'teamwork',   image: `${base}assets/images/teamwork.png`,   label: 'Teamwork',   count: gameState.valuesCollected.teamwork   },
+  { key: 'integrity',  image: `${base}assets/images/integrity.png`,  label: 'Integrity',  count: gameState.valuesCollected.integrity  },
+  { key: 'kindness',   image: `${base}assets/images/kindness.png`,   label: 'Kindness',   count: gameState.valuesCollected.kindness   },
+  { key: 'passion',    image: `${base}assets/images/passion.png`,    label: 'Passion',    count: gameState.valuesCollected.passion    },
 ])
 
 const maxCount = computed(() => Math.max(1, ...valueStats.value.map(v => v.count)))

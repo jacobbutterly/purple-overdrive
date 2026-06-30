@@ -35,13 +35,13 @@
     <!-- Status icons row -->
     <div class="hud-status-row">
       <div v-if="gameState.hasIntegrity" class="hud-shield-group">
-        <img src="/assets/images/integrity.png" class="hud-value-icon hud-icon--integrity" title="Integrity Shield" />
+        <img :src="base + 'assets/images/integrity.png'" class="hud-value-icon hud-icon--integrity" title="Integrity Shield" />
         <span class="hud-shield-label">SHIELD ACTIVE</span>
       </div>
-      <img v-if="gameState.passionActive" src="/assets/images/passion.png" class="hud-value-icon hud-icon--passion" title="Passion Mode!" />
+      <img v-if="gameState.passionActive" :src="base + 'assets/images/passion.png'" class="hud-value-icon hud-icon--passion" title="Passion Mode!" />
       <div v-if="gameState.disruptionActive" class="hud-icon hud-icon--disruption" title="Market Disruption!">⚠</div>
-      <img v-for="i in gameState.teammateCount" :key="i" src="/assets/images/teamwork.png" class="hud-value-icon hud-icon--teammate" />
-      <img v-if="gameState.weaponTier > 0" src="/assets/images/innovation.png" class="hud-value-icon hud-icon--weapon" title="Weapon Upgraded" />
+      <img v-for="i in gameState.teammateCount" :key="i" :src="base + 'assets/images/teamwork.png'" class="hud-value-icon hud-icon--teammate" />
+      <img v-if="gameState.weaponTier > 0" :src="base + 'assets/images/innovation.png'" class="hud-value-icon hud-icon--weapon" title="Weapon Upgraded" />
     </div>
 
     <!-- Boss health bar -->
@@ -94,6 +94,8 @@
 
 <script setup>
 import { computed } from 'vue'
+
+const base = import.meta.env.BASE_URL
 import { gameState } from '../gameState.js'
 
 function togglePause() {

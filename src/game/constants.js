@@ -129,11 +129,12 @@ export const ENEMY_TYPES = [
   },
 ]
 
+const _base = import.meta.env.BASE_URL
 export const POWERUP_TYPES = {
-  innovation: { color: 0xffcc00, label: '💡', size: 18, name: 'Innovation', effect: 'Upgrades your weapon',        image: '/assets/images/innovation.png' },
-  kindness:   { color: 0x44ff88, label: '💚', size: 18, name: 'Kindness',   effect: 'Restores +25 capacity',       image: '/assets/images/kindness.png' },
-  teammate:   { color: 0xff44cc, label: '👤', size: 18, name: 'Teamwork',   effect: 'Adds an orbiting teammate',   image: '/assets/images/teamwork.png' },
-  integrity:  { color: 0x4488ff, label: '💎', size: 18, name: 'Integrity',  effect: 'Grants an integrity shield',  image: '/assets/images/integrity.png' },
-  excellence: { color: 0xffdd00, label: '⭐', size: 18, name: 'Excellence', effect: 'Boosts your score multiplier', image: '/assets/images/excellence.png' },
-  passion:    { color: 0xff4444, label: '🔥', size: 18, name: 'Passion',    effect: 'Triggers speed & fire boost', image: '/assets/images/passion.png' },
+  innovation: { color: 0xffcc00, label: '💡', size: 18, name: 'Innovation', effect: 'Upgrades your weapon',         image: `${_base}assets/images/innovation.png` },
+  kindness:   { color: 0x44ff88, label: '💚', size: 18, name: 'Kindness',   effect: 'Restores +25 capacity',        image: `${_base}assets/images/kindness.png` },
+  teammate:   { color: 0xff44cc, label: '👤', size: 18, name: 'Teamwork',   effect: 'Adds an orbiting teammate',    image: `${_base}assets/images/teamwork.png` },
+  integrity:  { color: 0x4488ff, label: '💎', size: 18, name: 'Integrity',  effect: 'Grants an integrity shield',   image: `${_base}assets/images/integrity.png` },
+  excellence: { color: 0xffdd00, label: '⭐', size: 18, name: 'excellence', effect: 'Boosts your score multiplier', image: `${_base}assets/images/excellence.png` },
+  passion:    { color: 0xff4444, label: '🔥', size: 18, name: 'Passion',    effect: 'Triggers speed & fire boost',  image: `${_base}assets/images/passion.png` },
 }
