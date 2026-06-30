@@ -97,7 +97,7 @@ const formattedScore = computed(() => gameState.score.toLocaleString())
 
 const valueStats = computed(() => [
   { key: 'innovation', image: '/assets/images/innovation.png', label: 'Innovation', count: gameState.valuesCollected.innovation },
-  { key: 'excellence', image: '/assets/images/excellence.png', label: 'Excellence', count: gameState.valuesCollected.excellence },
+  { key: 'excellence', image: '/assets/images/excellence.png', label: 'excellence', count: gameState.valuesCollected.excellence },
   { key: 'teamwork',   image: '/assets/images/teamwork.png',   label: 'Teamwork',   count: gameState.valuesCollected.teamwork   },
   { key: 'integrity',  image: '/assets/images/integrity.png',  label: 'Integrity',  count: gameState.valuesCollected.integrity  },
   { key: 'kindness',   image: '/assets/images/kindness.png',   label: 'Kindness',   count: gameState.valuesCollected.kindness   },
@@ -126,7 +126,7 @@ function buildScorecard() {
     `🎯 Score:        ${score}`,
     '── Values Collected ──────────────',
     `💡 Innovation:   ${vc.innovation}×`,
-    `🏆 Excellence:   ${vc.excellence}×`,
+    `🏆 excellence:   ${vc.excellence}×`,
     `👥 Teamwork:     ${vc.teamwork}×`,
     `💎 Integrity:    ${vc.integrity}×`,
     `💚 Kindness:     ${vc.kindness}×`,
