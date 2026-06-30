@@ -162,7 +162,7 @@ export const ENEMY_TYPES = [
 
   // ── Boss ─────────────────────────────────────────────────────────────────
   {
-    name: 'theUnknownFuture', label: 'The Unknown\nFuture', rarity: 'boss',
+    name: 'theUnknownFuture', label: 'The VUCA\nWorld', rarity: 'boss',
     level: 3, w: 200, h: 120, hp: 500, speed: 40, score: 1000, isBoss: true,
     comicTexts: ['Future Proof!', 'We Are Ready!', "What's Next?!"],
   },

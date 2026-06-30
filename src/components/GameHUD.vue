@@ -46,7 +46,7 @@
 
     <!-- Boss health bar -->
     <div v-if="gameState.bossActive" class="hud-boss-bar">
-      <div class="hud-boss-label">⚠ THE UNKNOWN FUTURE</div>
+      <div class="hud-boss-label">⚠ THE VUCA WORLD</div>
       <div class="hud-boss-track">
         <div class="hud-boss-fill" :style="{ width: bossHealthPct + '%' }"></div>
       </div>

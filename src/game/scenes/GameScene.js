@@ -1234,7 +1234,7 @@ export class GameScene extends Phaser.Scene {
     bg.fillStyle(0xff0000, 0.7)
     bg.fillRect(0, this.H / 2 - 55, this.W, 110)
     bg.setDepth(88)
-    const txt = this.add.text(this.W / 2, this.H / 2, '⚠ THE UNKNOWN FUTURE APPROACHES!', {
+    const txt = this.add.text(this.W / 2, this.H / 2, '⚠ THE VUCA WORLD APPROACHES!', {
       fontFamily: 'Courier New',
       fontSize: Math.min(this.W * 0.048, 20) + 'px',
       color: '#ffffff',
@@ -1260,7 +1260,7 @@ export class GameScene extends Phaser.Scene {
     bg.fillRect(0, this.H / 2 - 65, this.W, 130)
     bg.setDepth(92)
 
-    const txt = this.add.text(this.W / 2, this.H / 2, '🏆 THE UNKNOWN FUTURE DEFEATED!\nMISSION ACCOMPLISHED!', {
+    const txt = this.add.text(this.W / 2, this.H / 2, '🏆 THE VUCA WORLD DEFEATED!\nMISSION ACCOMPLISHED!', {
       fontFamily: 'Courier New',
       fontSize: Math.min(this.W * 0.048, 20) + 'px',
       color: '#000000',

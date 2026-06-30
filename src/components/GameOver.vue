@@ -9,7 +9,7 @@
         </div>
 
         <div v-if="gameState.bossDefeated" class="boss-defeated-badge">
-          ⚡ THE UNKNOWN FUTURE DEFEATED
+          ⚡ THE VUCA WORLD DEFEATED
         </div>
 
         <div v-if="gameState.playerName" class="player-greeting">
@@ -22,7 +22,7 @@
 
         <p class="gameover-sub">
           {{ gameState.bossDefeated
-            ? 'The Unknown Future has fallen. The A-Team secured the future.'
+            ? 'The VUCA World has fallen. The A-Team secured the future.'
             : gameState.victory
               ? 'You overcame every challenge. The A-Team surges on!'
               : 'The challenges were too great — but the team fights on.' }}
@@ -116,7 +116,7 @@ function valueBarWidth(count) {
 function buildScorecard() {
   const name = gameState.playerName || 'Agent'
   const outcome = gameState.bossDefeated
-    ? '🏆 MASTER COMPLETE — THE UNKNOWN FUTURE DEFEATED'
+    ? '🏆 MASTER COMPLETE — THE VUCA WORLD DEFEATED'
     : gameState.victory ? '✅ MISSION ACCOMPLISHED' : '❌ Game Over'
   const score = gameState.score.toLocaleString()
   const vc = gameState.valuesCollected
@@ -135,7 +135,7 @@ function buildScorecard() {
     `💚 Kindness:     ${vc.kindness}×`,
     `🔥 Passion:      ${vc.passion}×`,
     '─────────────────────────────────',
-    ...(gameState.bossDefeated ? ['🏆 BOSS DEFEATED: The Unknown Future'] : []),
+    ...(gameState.bossDefeated ? ['🏆 BOSS DEFEATED: The VUCA World'] : []),
     'Can you beat this? 🚀 #PurpleOverdrive',
   ].join('\n')
 }
@@ -454,7 +454,7 @@ function copyScorecard() {
   margin-bottom: 16px;
 }
 
-.copy-btn, .download-btn, .replay-btn, .home-btn {
+.copy-btn, .download-btn, .slack-btn, .replay-btn, .home-btn {
   font-family: 'Courier New', monospace;
   font-size: clamp(13px, 3.5vw, 16px);
   padding: 14px 24px;

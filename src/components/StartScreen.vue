@@ -87,7 +87,7 @@
             </div>
             <div class="threat-card threat-card--boss">
               <div class="threat-silhouette threat-silhouette--boss"></div>
-              <span class="threat-label threat-label--boss">⚠ THE UNKNOWN FUTURE</span>
+              <span class="threat-label threat-label--boss">⚠ THE VUCA WORLD</span>
             </div>
           </div>
         </div>
@@ -182,7 +182,7 @@
             <div class="tutorial-item tutorial-item--boss">
               <span class="tutorial-icon">⚡</span>
               <div class="tutorial-text">
-                <span class="tutorial-heading">Face The Unknown Future</span>
+                <span class="tutorial-heading">Face The VUCA World</span>
                 <span class="tutorial-body">The boss arrives in the final 15 seconds. Defeat it to achieve Master Complete.</span>
               </div>
             </div>
