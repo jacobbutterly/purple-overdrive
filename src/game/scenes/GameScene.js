@@ -14,6 +14,15 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' })
   }
 
+  preload() {
+    this.load.image('powerup_innovation', '/assets/images/innovation.png')
+    this.load.image('powerup_kindness',   '/assets/images/kindness.png')
+    this.load.image('powerup_teammate',   '/assets/images/teamwork.png')
+    this.load.image('powerup_integrity',  '/assets/images/integrity.png')
+    this.load.image('powerup_excellence', '/assets/images/excellence.png')
+    this.load.image('powerup_passion',    '/assets/images/passion.png')
+  }
+
   create() {
     this.W = this.scale.width
     this.H = this.scale.height
@@ -816,12 +825,10 @@ export class GameScene extends Phaser.Scene {
     const gfx = this.add.graphics()
     gfx.setDepth(7)
 
-    const txt = this.add.text(x, y, def.label, {
-      fontSize: '20px',
-      align: 'center',
-    }).setOrigin(0.5).setDepth(8)
+    const img = this.add.image(x, y, `powerup_${typeKey}`)
+      .setOrigin(0.5).setDepth(8).setDisplaySize(30, 30)
 
-    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, txt, angle: 0, life: 12, collected: false }
+    const pu = { key: typeKey, x, y, size: def.size, color: def.color, gfx, img, angle: 0, life: 12, collected: false }
     this._drawPowerup(pu)
     this.powerups.push(pu)
     this.audio.sfxPowerupSpawn()
@@ -866,8 +873,7 @@ export class GameScene extends Phaser.Scene {
     // Inner lit background circle
     g.fillStyle(0xffffff, 0.18)
     g.fillCircle(pu.x, py, pu.size + 4)
-    // Sync emoji text
-    if (pu.txt) pu.txt.setPosition(pu.x, py)
+    if (pu.img) pu.img.setPosition(pu.x, py)
   }
 
   _updatePowerups(dt) {
@@ -879,7 +885,7 @@ export class GameScene extends Phaser.Scene {
       this._drawPowerup(pu)
       if (pu.life <= 0 || pu.collected) {
         pu.gfx.destroy()
-        if (pu.txt) pu.txt.destroy()
+        if (pu.img) pu.img.destroy()
         this.powerups.splice(i, 1)
       }
     }
@@ -971,7 +977,7 @@ export class GameScene extends Phaser.Scene {
           this._showFloatingText(pu.x, pu.y + 36, this._weaponTierName(gameState.weaponTier), COLORS.innovation)
         } else {
           this._triggerOverclock()
-          this._showFloatingText(pu.x, pu.y + 36, '💡 Overclock!', COLORS.innovation)
+          this._showFloatingText(pu.x, pu.y + 36, 'Overclock!', COLORS.innovation)
         }
         break
       case 'kindness':
@@ -996,7 +1002,7 @@ export class GameScene extends Phaser.Scene {
         break
       case 'passion':
         this._triggerPassion()
-        this._showFloatingText(pu.x, pu.y + 36, '🔥 Passion!', COLORS.passion)
+        this._showFloatingText(pu.x, pu.y + 36, 'Passion!', COLORS.passion)
         break
     }
   }

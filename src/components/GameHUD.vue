@@ -35,13 +35,13 @@
     <!-- Status icons row -->
     <div class="hud-status-row">
       <div v-if="gameState.hasIntegrity" class="hud-shield-group">
-        <div class="hud-icon hud-icon--integrity" title="Integrity Shield">🛡</div>
+        <img src="/assets/images/integrity.png" class="hud-value-icon hud-icon--integrity" title="Integrity Shield" />
         <span class="hud-shield-label">SHIELD ACTIVE</span>
       </div>
-      <div v-if="gameState.passionActive" class="hud-icon hud-icon--passion" title="Passion Mode!">🔥</div>
+      <img v-if="gameState.passionActive" src="/assets/images/passion.png" class="hud-value-icon hud-icon--passion" title="Passion Mode!" />
       <div v-if="gameState.disruptionActive" class="hud-icon hud-icon--disruption" title="Market Disruption!">⚠</div>
-      <div v-for="i in gameState.teammateCount" :key="i" class="hud-icon hud-icon--teammate">👤</div>
-      <div v-if="gameState.weaponTier > 0" class="hud-icon hud-icon--weapon">{{ weaponIcon }}</div>
+      <img v-for="i in gameState.teammateCount" :key="i" src="/assets/images/teamwork.png" class="hud-value-icon hud-icon--teammate" />
+      <img v-if="gameState.weaponTier > 0" src="/assets/images/innovation.png" class="hud-value-icon hud-icon--weapon" title="Weapon Upgraded" />
     </div>
 
     <!-- Boss health bar -->
@@ -122,11 +122,6 @@ const healthBarColor = computed(() => {
   if (h > 60) return '#44ff88'
   if (h > 30) return '#ffdd00'
   return '#ff4444'
-})
-
-const weaponIcon = computed(() => {
-  const icons = ['', '💡', '🌀', '✨']
-  return icons[gameState.weaponTier] || '✨'
 })
 
 const disruptionLabel = computed(() => {
@@ -287,6 +282,16 @@ const bossHealthPct = computed(() => {
   background: rgba(0,0,0,0.5);
   border-radius: 6px;
   padding: 2px 6px;
+}
+
+.hud-value-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  background: rgba(0,0,0,0.5);
+  border-radius: 6px;
+  padding: 3px;
+  box-sizing: border-box;
 }
 
 .hud-shield-group {
