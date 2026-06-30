@@ -444,6 +444,8 @@ export class GameScene extends Phaser.Scene {
       tm.x = this.player.x + Math.cos(angle) * orbitR
       tm.y = this.player.y + Math.sin(angle) * orbitR
 
+      if (tm.txt) tm.txt.setPosition(tm.x, tm.y)
+
       // Draw teammate
       tm.gfx.clear()
       tm.gfx.fillStyle(COLORS.teammate, 0.9)
@@ -988,8 +990,12 @@ export class GameScene extends Phaser.Scene {
       case 'teammate':
         if (gameState.teammateCount < 4) {
           gameState.teammateCount++
-          this.teammates.push({ x: this.player.x, y: this.player.y, gfx: this.add.graphics(), fireTimer: 0 })
-          this.teammates[this.teammates.length - 1].gfx.setDepth(9)
+          const tmGfx = this.add.graphics().setDepth(9)
+          const tmTxt = this.add.text(this.player.x, this.player.y, '👾', {
+            fontSize: '11px',
+            align: 'center',
+          }).setOrigin(0.5).setDepth(10)
+          this.teammates.push({ x: this.player.x, y: this.player.y, gfx: tmGfx, txt: tmTxt, fireTimer: 0 })
           this._showFloatingText(pu.x, pu.y + 36, 'Teammate Joined!', COLORS.teamwork)
         }
         break
