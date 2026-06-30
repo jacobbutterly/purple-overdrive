@@ -531,13 +531,7 @@ export class GameScene extends Phaser.Scene {
     gfx.fillStyle(drawColor, 1)
     if (tier === 1) {
       gfx.fillRect(-11, -1.5, 22, 3)
-    } else if (tier === 2) {
-      gfx.fillCircle(0, 0, 5)
-    } else if (tier === 3) {
-      gfx.fillStyle(drawColor, 0.35)
-      gfx.fillCircle(0, 0, 9)
-      gfx.fillStyle(drawColor, 1)
-      gfx.fillCircle(0, 0, 5)
+      gfx.rotation = Math.atan2(vy, vx)
     } else {
       gfx.fillRect(-5, -2, 10, 4)
     }
