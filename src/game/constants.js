@@ -59,6 +59,16 @@ export const ENEMY_TYPES = [
     comicTexts: ['Automated!', 'Pivot That!', 'Data Liberated!'],
   },
   {
+    name: 'jiraChasing', label: 'Jira\nChasing', rarity: 'common',
+    level: 1, w: 95, h: 55, hp: 2, speed: 45, score: 10,
+    comicTexts: ['Board Updated!', 'Correct Status!', 'Auto-Retroed!'],
+  },
+  {
+    name: 'postmanRot', label: 'Postman\nRot', rarity: 'common',
+    level: 1, w: 90, h: 55, hp: 2, speed: 65, score: 10,
+    comicTexts: ['API Verified!', 'Repo Scanned!', 'Auto-Updated!'],
+  },
+  {
     name: 'manualOkrTracking', label: 'Manual OKR\nTracking', rarity: 'common',
     level: 1, w: 100, h: 55, hp: 2, speed: 50, score: 10,
     comicTexts: ['Auto-Tracked!', '100% Achieved!', 'Algorithmic Success!'],
@@ -66,7 +76,12 @@ export const ENEMY_TYPES = [
   {
     name: 'endlessMeeting', label: 'Endless\nMeeting', rarity: 'common',
     level: 2, w: 120, h: 70, hp: 5, speed: 70, score: 25,
-    comicTexts: ['This could have been an email!', 'Calendar Cleared!', 'Declined!'],
+    comicTexts: ['Gemini took the notes!', 'Calendar Cleared!', 'Declined!'],
+  },
+  {
+    name: 'cloudSprawl', label: 'GCP Cloud\nSprawl', rarity: 'rare',
+    level: 2, w: 125, h: 72, hp: 7, speed: 50, score: 45, isRare: true,
+    comicTexts: ['Disks Purged!', '10TB lighter!', 'Budget Saved!'],
   },
   {
     name: 'outdatedStats', label: 'Outdated\nDeck Stats', rarity: 'common',
@@ -79,11 +94,10 @@ export const ENEMY_TYPES = [
     comicTexts: ['Scope Locked!', 'MVP Only!', 'Requirements Frozen!'],
   },
   {
-    name: 'legacyRedTape', label: 'Legacy\nRed Tape', rarity: 'common',
-    level: 3, w: 150, h: 85, hp: 10, speed: 80, score: 50,
-    comicTexts: ['Disrupted!', 'Modernized!', 'Agile Now!'],
+    name: 'legacyMonolith', label: 'Legacy\nMonolith', rarity: 'common',
+    level: 3, w: 150, h: 85, hp: 12, speed: 75, score: 50,
+    comicTexts: ['Migrated to AIR!', 'Onboarding Mentored!', 'Queue Mapped!'],
   },
-
   // ── Rare ─────────────────────────────────────────────────────────────────
   {
     name: 'legacySpreadsheet', label: 'Legacy Spreadsheet V3_FINAL_FINAL', rarity: 'rare',
@@ -126,19 +140,19 @@ export const ENEMY_TYPES = [
     comicTexts: ['Scope Frozen!', 'Change Blocked!', 'Too Late!'],
   },
   {
-    name: 'notificationSpam', label: '🔔', rarity: 'rare',
+    name: 'notificationSpam', label: '#', rarity: 'rare',
     level: 2, w: 32, h: 32, hp: 1, speed: 230, score: 8, isSwarm: true, isRare: true,
     comicTexts: ['Muted!', 'Do Not Disturb!', 'Silenced!'],
   },
   {
     name: 'doubleBooked', label: '📅 Double\nBooked', rarity: 'rare',
     level: 2, w: 88, h: 58, hp: 6, speed: 42, score: 80, isLinked: true, isRare: true,
-    comicTexts: ['Calendar Cleared!', 'Both Declined!', 'Time Reclaimed!'],
+    comicTexts: ['Calendar Cleared!', 'Time Reclaimed!', 'Where was I?'],
   },
   {
     name: 'jargonDocumentation', label: 'Internal Jargon\nDocumentation', rarity: 'common',
     level: 3, w: 140, h: 85, hp: 12, speed: 85, score: 50,
-    comicTexts: ['Translated to Human!', 'Corporate Filter Active!', 'Plain Text Mode!'],
+    comicTexts: ['Translated to Human!', 'Plain Text Mode!'],
   },
 
   // ── Boss ─────────────────────────────────────────────────────────────────
