@@ -68,11 +68,11 @@
           <div class="threats-grid">
             <div class="threat-card threat-card--common">
               <div class="threat-silhouette threat-silhouette--common"></div>
-              <span class="threat-label">⚠ Workplace Challenge</span>
+              <span class="threat-label">⚠ Everyday Disruption</span>
             </div>
             <div class="threat-card threat-card--rare">
               <div class="threat-silhouette threat-silhouette--rare"></div>
-              <span class="threat-label">★ Rare Threat</span>
+              <span class="threat-label">★ Critical Threat</span>
               <span class="threat-rarity-badge">RARE</span>
             </div>
             <div class="threat-card threat-card--swarm">

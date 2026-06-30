@@ -78,10 +78,6 @@
             <span class="pause-action">Move</span>
           </div>
           <div class="pause-control-row">
-            <span class="pause-key">Auto</span>
-            <span class="pause-action">Fire (stay near enemies)</span>
-          </div>
-          <div class="pause-control-row">
             <span class="pause-key">P / Esc</span>
             <span class="pause-action">Pause / Resume</span>
           </div>
@@ -127,7 +123,8 @@ const healthBarColor = computed(() => {
 })
 
 const disruptionLabel = computed(() => {
-  return gameState.disruptionType === 'inverted' ? 'Controls Inverted!' : 'Weapons Offline!'
+  if (gameState.disruptionType === 'inverted') return 'Controls Inverted!'
+  return 'Rely on your teammates to help you!'
 })
 
 const bossHealthPct = computed(() => {

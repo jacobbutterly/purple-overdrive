@@ -35,6 +35,12 @@
             <span class="stat-value">{{ formattedScore }}</span>
           </div>
 
+          <div class="stat-row">
+            <span class="stat-icon">💀</span>
+            <span class="stat-label">Defeated</span>
+            <span class="stat-value">{{ gameState.enemiesDefeated }}</span>
+          </div>
+
           <div class="values-header">
             <span class="values-header-line" />
             <span class="values-header-text">Values Collected</span>
@@ -127,6 +133,7 @@ function buildScorecard() {
     outcome,
     '─────────────────────────────────',
     `🎯 Score:        ${score}`,
+    `💀 Defeated:     ${gameState.enemiesDefeated}`,
     '── Values Collected ──────────────',
     `💡 Innovation:   ${vc.innovation}×`,
     `🏆 excellence:   ${vc.excellence}×`,

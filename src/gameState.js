@@ -23,6 +23,7 @@ export const gameState = reactive({
   paused: false,
   continueMode: false,
   endRequested: false,
+  enemiesDefeated: 0,
   valuesCollected: {
     innovation: 0,
     kindness: 0,
@@ -55,6 +56,7 @@ export function resetGameState() {
   gameState.paused = false
   gameState.continueMode = false
   gameState.endRequested = false
+  gameState.enemiesDefeated = 0
   gameState.valuesCollected = {
     innovation: 0,
     kindness: 0,

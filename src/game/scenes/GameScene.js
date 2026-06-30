@@ -738,6 +738,15 @@ export class GameScene extends Phaser.Scene {
         g.lineBetween(e.x - hw + 6, e.y - hh + 6, e.x + hw - 6, e.y + hh - 6)
         g.lineBetween(e.x + hw - 6, e.y - hh + 6, e.x - hw + 6, e.y + hh - 6)
       }
+      const barW = e.w - 8
+      const barH = 5
+      const bx = e.x - barW / 2
+      const by = e.y + e.h / 2 + 4
+      const pct = e.hp / e.maxHp
+      g.fillStyle(0x333333, 1)
+      g.fillRect(bx, by, barW, barH)
+      g.fillStyle(0xaaaaaa, 1)
+      g.fillRect(bx, by, barW * pct, barH)
       return
     }
 
@@ -796,7 +805,7 @@ export class GameScene extends Phaser.Scene {
     g.lineStyle(e.isBoss ? 3 : 2, strokeColor, 1)
     g.strokeRoundedRect(e.x - e.w / 2, e.y - e.h / 2, e.w, e.h, 8)
 
-    if (e.isBoss && e.maxHp > 10) {
+    if (e.maxHp >= 10) {
       const barW = e.w - 10
       const barH = 6
       const bx = e.x - barW / 2
@@ -804,7 +813,7 @@ export class GameScene extends Phaser.Scene {
       const pct = e.hp / e.maxHp
       g.fillStyle(0x444444, 1)
       g.fillRect(bx, by, barW, barH)
-      g.fillStyle(0xff4444, 1)
+      g.fillStyle(e.isBoss ? 0xff4444 : 0xaaaaaa, 1)
       g.fillRect(bx, by, barW * pct, barH)
     }
   }
@@ -1076,6 +1085,7 @@ export class GameScene extends Phaser.Scene {
   _killEnemy(e) {
     const pts = e.score * gameState.streakMultiplier
     gameState.score += pts
+    gameState.enemiesDefeated++
 
     // Comic text
     const lines = e.comicTexts || ['Eliminated!']
