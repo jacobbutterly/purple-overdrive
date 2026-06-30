@@ -448,9 +448,9 @@ export class GameScene extends Phaser.Scene {
 
       // Draw teammate
       tm.gfx.clear()
-      tm.gfx.fillStyle(COLORS.player, 0.9)
+      tm.gfx.fillStyle(COLORS.playerGlow, 1)
       tm.gfx.fillCircle(tm.x, tm.y, 10)
-      tm.gfx.lineStyle(2, COLORS.playerGlow, 0.5)
+      tm.gfx.lineStyle(2, 0xffffff, 0.85)
       tm.gfx.strokeCircle(tm.x, tm.y, 10)
 
       // Teammate auto-fire
