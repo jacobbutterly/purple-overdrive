@@ -68,6 +68,7 @@ export class GameScene extends Phaser.Scene {
     // Boss state
     this.bossSpawned = false
     this.bossEntity = null
+    this.afterBossTimer = 0
 
     // Weapon / fire tracking
     this.fireTimer = 0
@@ -209,10 +210,23 @@ export class GameScene extends Phaser.Scene {
     if (!this.gameRunning) return
     if (gameState.paused) return
 
-    // Restart music if player chose to keep fighting
+    // Restart music when entering continue/after-boss mode
     if (gameState.continueMode && !this._continueMusicRestarted) {
       this._continueMusicRestarted = true
       this.audio.startMusic(this.currentLevelConfig.musicBPM)
+    }
+    if (gameState.afterBossMode && !this._afterBossMusicStarted) {
+      this._afterBossMusicStarted = true
+      this.audio.startMusic(this.currentLevelConfig.musicBPM)
+    }
+
+    // After-boss endless mode: spawn a new boss every 4 minutes
+    if (gameState.afterBossMode && !gameState.bossActive) {
+      this.afterBossTimer += dt
+      if (this.afterBossTimer >= 240) {
+        this.afterBossTimer = 0
+        this._spawnBoss()
+      }
     }
 
     const dt = delta / 1000
@@ -1110,8 +1124,20 @@ export class GameScene extends Phaser.Scene {
     if (e.isBoss) {
       gameState.bossDefeated = true
       gameState.bossActive = false
+      this.bossEntity = null
       this._showBossDefeatedBanner()
-      this.time.delayedCall(2200, () => this._endGame(true))
+      if (gameState.afterBossMode) {
+        // Endless mode — reset timer, next boss arrives in 4 minutes
+        this.afterBossTimer = 0
+      } else {
+        // First boss defeat — pause and offer the continue screen
+        this.time.delayedCall(2200, () => {
+          this._afterBossMusicStarted = false
+          gameState.paused = true
+          gameState.phase = 'continue'
+          this.audio.stopMusic()
+        })
+      }
     }
   }
 
