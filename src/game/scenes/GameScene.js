@@ -220,6 +220,8 @@ export class GameScene extends Phaser.Scene {
       this.audio.startMusic(this.currentLevelConfig.musicBPM)
     }
 
+    const dt = delta / 1000
+
     // After-boss endless mode: spawn a new boss every 4 minutes
     if (gameState.afterBossMode && !gameState.bossActive) {
       this.afterBossTimer += dt
@@ -228,8 +230,6 @@ export class GameScene extends Phaser.Scene {
         this._spawnBoss()
       }
     }
-
-    const dt = delta / 1000
 
     this.elapsedTime += dt
     const remaining = gameState.continueMode ? 0 : Math.max(0, TIMING.gameDuration - this.elapsedTime)
