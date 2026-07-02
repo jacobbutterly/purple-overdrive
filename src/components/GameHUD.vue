@@ -83,6 +83,9 @@
           </div>
         </div>
         <button class="pause-resume-btn" @click="togglePause">▶ RESUME</button>
+        <button v-if="gameState.continueMode" class="pause-end-btn" @click="endMission">
+          {{ gameState.bossDefeated ? '🏆 Claim Victory' : '🏁 End Mission' }}
+        </button>
       </div>
     </div>
   </div>
@@ -96,6 +99,12 @@ import { gameState } from '../gameState.js'
 
 function togglePause() {
   gameState.paused = !gameState.paused
+}
+
+function endMission() {
+  gameState.victory = true
+  gameState.endRequested = true
+  gameState.paused = false
 }
 
 const formattedScore = computed(() => {
@@ -514,4 +523,21 @@ const bossHealthPct = computed(() => {
 
 .pause-resume-btn:hover { box-shadow: 0 0 36px #9B30FFcc; transform: scale(1.03); }
 .pause-resume-btn:active { transform: scale(0.96); }
+
+.pause-end-btn {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: #cc44ff;
+  letter-spacing: 2px;
+  background: transparent;
+  border: 2px solid #cc44ff55;
+  border-radius: 40px;
+  padding: 11px 28px;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.pause-end-btn:hover { border-color: #cc44ff; }
+.pause-end-btn:active { transform: scale(0.96); }
 </style>
