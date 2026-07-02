@@ -64,6 +64,7 @@ export class GameScene extends Phaser.Scene {
     // Disruption state
     this.disruptionTimer = 0
     this.disruptionTriggered = false
+    this.endlessDisruptionTimer = 0
 
     // Boss state
     this.bossSpawned = false
@@ -228,6 +229,15 @@ export class GameScene extends Phaser.Scene {
       if (this.afterBossTimer >= 240) {
         this.afterBossTimer = 0
         this._spawnBoss()
+      }
+    }
+
+    // After-boss endless mode: recurring market disruption every few minutes
+    if (gameState.afterBossMode) {
+      this.endlessDisruptionTimer += dt
+      if (this.endlessDisruptionTimer >= TIMING.endlessDisruptionInterval && !this.disruptionActive) {
+        this.endlessDisruptionTimer = 0
+        this._triggerDisruption()
       }
     }
 

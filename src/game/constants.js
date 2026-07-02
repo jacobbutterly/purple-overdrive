@@ -32,6 +32,7 @@ export const TIMING = {
   level3Start: 120,        // remaining time at which level 3 begins (60s elapsed)
   disruptionStart: 90,     // remaining time for disruption (90s elapsed = 1:30)
   disruptionDuration: 15,
+  endlessDisruptionInterval: 120, // recurring market disruption cadence in endless (after-boss) mode
   bossSpawn: 15,           // remaining time for boss (165s elapsed = 2:45)
   excellenceStreakTime: 15, // seconds without damage for streak
   passionHealthThreshold: 20,

@@ -83,7 +83,7 @@
               <div class="threat-silhouette threat-silhouette--swarm">
                 <span class="swarm-dot"></span>
                 <span class="swarm-dot"></span>
-                <span class="swarm-dot"></span>
+                <span class="swarm-dot swarm-dot--sms"></span>
                 <span class="swarm-dot"></span>
                 <span class="swarm-dot"></span>
               </div>
@@ -405,6 +405,12 @@ function handleStart() {
   background: #ff6600;
   border: 1px solid #ff9944;
   box-shadow: 0 0 6px #ff660088;
+}
+
+.swarm-dot--sms {
+  background: #2288ff;
+  border: 1px solid #66aaff;
+  box-shadow: 0 0 6px #2288ff88;
 }
 
 .threat-silhouette--boss {
