@@ -40,7 +40,10 @@
       </div>
       <img v-if="gameState.passionActive" :src="base + 'assets/images/passion.png'" class="hud-value-icon hud-icon--passion" title="Passion Mode!" />
       <div v-if="gameState.disruptionActive" class="hud-icon hud-icon--disruption" title="Market Disruption!">⚠</div>
-      <img v-for="i in gameState.teammateCount" :key="i" :src="base + 'assets/images/teamwork.png'" class="hud-value-icon hud-icon--teammate" />
+      <div v-if="gameState.teammateCount > 0" class="hud-teammate-group">
+        <img :src="base + 'assets/images/teamwork.png'" class="hud-value-icon hud-icon--teammate" title="Teammates" />
+        <span class="hud-teammate-count">×{{ gameState.teammateCount }}</span>
+      </div>
       <img v-if="gameState.weaponTier > 0" :src="base + 'assets/images/innovation.png'" class="hud-value-icon hud-icon--weapon" title="Weapon Upgraded" />
     </div>
 
@@ -320,6 +323,20 @@ const bossHealthPct = computed(() => {
 
 .hud-icon--integrity {
   animation: shield-glow 1.6s ease-in-out infinite;
+}
+
+.hud-teammate-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-teammate-count {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  color: #ff44cc;
+  text-shadow: 0 0 8px #ff44cc99;
 }
 
 @keyframes shield-glow {
