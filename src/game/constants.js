@@ -32,6 +32,7 @@ export const TIMING = {
   level3Start: 120,        // remaining time at which level 3 begins (60s elapsed)
   disruptionStart: 90,     // remaining time for disruption (90s elapsed = 1:30)
   disruptionDuration: 15,
+  endlessDisruptionInterval: 120, // recurring market disruption cadence in endless (after-boss) mode
   bossSpawn: 15,           // remaining time for boss (165s elapsed = 2:45)
   excellenceStreakTime: 15, // seconds without damage for streak
   passionHealthThreshold: 20,
@@ -174,6 +175,6 @@ export const POWERUP_TYPES = {
   kindness:   { color: 0x44ff88, label: '💚', size: 18, name: 'Kindness',   effect: 'Restores +25 capacity',        image: `${_base}assets/images/kindness.png` },
   teammate:   { color: 0xff44cc, label: '👤', size: 18, name: 'Teamwork',   effect: 'Adds an orbiting teammate',    image: `${_base}assets/images/teamwork.png` },
   integrity:  { color: 0x4488ff, label: '💎', size: 18, name: 'Integrity',  effect: 'Grants an integrity shield',   image: `${_base}assets/images/integrity.png` },
-  excellence: { color: 0xffdd00, label: '⭐', size: 18, name: 'excellence', effect: 'Boosts your score multiplier', image: `${_base}assets/images/excellence.png` },
+  excellence: { color: 0xffdd00, label: '⭐', size: 18, name: 'Excellence', effect: 'Boosts your score multiplier', image: `${_base}assets/images/excellence.png` },
   passion:    { color: 0xff4444, label: '🔥', size: 18, name: 'Passion',    effect: 'Triggers speed & fire boost',  image: `${_base}assets/images/passion.png` },
 }

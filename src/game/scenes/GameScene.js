@@ -64,6 +64,7 @@ export class GameScene extends Phaser.Scene {
     // Disruption state
     this.disruptionTimer = 0
     this.disruptionTriggered = false
+    this.endlessDisruptionTimer = 0
 
     // Boss state
     this.bossSpawned = false
@@ -220,6 +221,8 @@ export class GameScene extends Phaser.Scene {
       this.audio.startMusic(this.currentLevelConfig.musicBPM)
     }
 
+    const dt = delta / 1000
+
     // After-boss endless mode: spawn a new boss every 4 minutes
     if (gameState.afterBossMode && !gameState.bossActive) {
       this.afterBossTimer += dt
@@ -229,7 +232,14 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    const dt = delta / 1000
+    // After-boss endless mode: recurring market disruption every few minutes
+    if (gameState.afterBossMode) {
+      this.endlessDisruptionTimer += dt
+      if (this.endlessDisruptionTimer >= TIMING.endlessDisruptionInterval && !this.disruptionActive) {
+        this.endlessDisruptionTimer = 0
+        this._triggerDisruption()
+      }
+    }
 
     this.elapsedTime += dt
     const remaining = gameState.continueMode ? 0 : Math.max(0, TIMING.gameDuration - this.elapsedTime)
@@ -1057,7 +1067,7 @@ export class GameScene extends Phaser.Scene {
         break
       case 'excellence':
         gameState.streakMultiplier = Math.min(5, gameState.streakMultiplier + 1)
-        this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× excellence!`, COLORS.excellence)
+        this._showFloatingText(pu.x, pu.y + 36, `${gameState.streakMultiplier}× Excellence!`, COLORS.excellence)
         break
       case 'passion':
         this._triggerPassion()
@@ -1231,13 +1241,13 @@ export class GameScene extends Phaser.Scene {
       this.streakChecked4x = true
       gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 4)
       gameState.bestStreak = Math.max(gameState.bestStreak, 4)
-      this._showFloatingText(this.player.x, this.player.y - 50, '4× excellence!', COLORS.excellence)
+      this._showFloatingText(this.player.x, this.player.y - 50, '4× Excellence!', COLORS.excellence)
     }
     if (this.timeSinceLastHit >= 60 && !this.streakChecked5x) {
       this.streakChecked5x = true
       gameState.streakMultiplier = Math.max(gameState.streakMultiplier, 5)
       gameState.bestStreak = Math.max(gameState.bestStreak, 5)
-      this._showFloatingText(this.player.x, this.player.y - 50, '5× excellence! UNSTOPPABLE!', COLORS.excellence)
+      this._showFloatingText(this.player.x, this.player.y - 50, '5× Excellence! UNSTOPPABLE!', COLORS.excellence)
     }
   }
 

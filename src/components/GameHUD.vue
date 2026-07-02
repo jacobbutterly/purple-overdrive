@@ -40,7 +40,10 @@
       </div>
       <img v-if="gameState.passionActive" :src="base + 'assets/images/passion.png'" class="hud-value-icon hud-icon--passion" title="Passion Mode!" />
       <div v-if="gameState.disruptionActive" class="hud-icon hud-icon--disruption" title="Market Disruption!">⚠</div>
-      <img v-for="i in gameState.teammateCount" :key="i" :src="base + 'assets/images/teamwork.png'" class="hud-value-icon hud-icon--teammate" />
+      <div v-if="gameState.teammateCount > 0" class="hud-teammate-group">
+        <img :src="base + 'assets/images/teamwork.png'" class="hud-value-icon hud-icon--teammate" title="Teammates" />
+        <span class="hud-teammate-count">×{{ gameState.teammateCount }}</span>
+      </div>
       <img v-if="gameState.weaponTier > 0" :src="base + 'assets/images/innovation.png'" class="hud-value-icon hud-icon--weapon" title="Weapon Upgraded" />
     </div>
 
@@ -83,6 +86,9 @@
           </div>
         </div>
         <button class="pause-resume-btn" @click="togglePause">▶ RESUME</button>
+        <button v-if="gameState.continueMode" class="pause-end-btn" @click="endMission">
+          {{ gameState.bossDefeated ? '🏆 Claim Victory' : '🏁 End Mission' }}
+        </button>
       </div>
     </div>
   </div>
@@ -96,6 +102,12 @@ import { gameState } from '../gameState.js'
 
 function togglePause() {
   gameState.paused = !gameState.paused
+}
+
+function endMission() {
+  gameState.victory = true
+  gameState.endRequested = true
+  gameState.paused = false
 }
 
 const formattedScore = computed(() => {
@@ -313,6 +325,20 @@ const bossHealthPct = computed(() => {
   animation: shield-glow 1.6s ease-in-out infinite;
 }
 
+.hud-teammate-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hud-teammate-count {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  color: #ff44cc;
+  text-shadow: 0 0 8px #ff44cc99;
+}
+
 @keyframes shield-glow {
   0%, 100% { box-shadow: 0 0 6px #44ffdd88; transform: scale(1); }
   50% { box-shadow: 0 0 16px #44ffddcc, 0 0 28px #44ffdd55; transform: scale(1.1); }
@@ -514,4 +540,21 @@ const bossHealthPct = computed(() => {
 
 .pause-resume-btn:hover { box-shadow: 0 0 36px #9B30FFcc; transform: scale(1.03); }
 .pause-resume-btn:active { transform: scale(0.96); }
+
+.pause-end-btn {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: #cc44ff;
+  letter-spacing: 2px;
+  background: transparent;
+  border: 2px solid #cc44ff55;
+  border-radius: 40px;
+  padding: 11px 28px;
+  margin-top: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.pause-end-btn:hover { border-color: #cc44ff; }
+.pause-end-btn:active { transform: scale(0.96); }
 </style>

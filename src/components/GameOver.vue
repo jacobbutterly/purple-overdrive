@@ -106,7 +106,7 @@ const formattedScore = computed(() => gameState.score.toLocaleString())
 const base = import.meta.env.BASE_URL
 const valueStats = computed(() => [
   { key: 'innovation', image: `${base}assets/images/innovation.png`, label: 'Innovation', count: gameState.valuesCollected.innovation },
-  { key: 'excellence', image: `${base}assets/images/excellence.png`, label: 'excellence', count: gameState.valuesCollected.excellence },
+  { key: 'excellence', image: `${base}assets/images/excellence.png`, label: 'Excellence', count: gameState.valuesCollected.excellence },
   { key: 'teamwork',   image: `${base}assets/images/teamwork.png`,   label: 'Teamwork',   count: gameState.valuesCollected.teamwork   },
   { key: 'integrity',  image: `${base}assets/images/integrity.png`,  label: 'Integrity',  count: gameState.valuesCollected.integrity  },
   { key: 'kindness',   image: `${base}assets/images/kindness.png`,   label: 'Kindness',   count: gameState.valuesCollected.kindness   },
@@ -136,7 +136,7 @@ function buildScorecard() {
     `💀 Defeated:     ${gameState.enemiesDefeated}`,
     '── Values Collected ──────────────',
     `💡 Innovation:   ${vc.innovation}×`,
-    `🏆 excellence:   ${vc.excellence}×`,
+    `🏆 Excellence:   ${vc.excellence}×`,
     `👥 Teamwork:     ${vc.teamwork}×`,
     `💎 Integrity:    ${vc.integrity}×`,
     `💚 Kindness:     ${vc.kindness}×`,
@@ -214,8 +214,9 @@ function copyScorecard() {
   inset: 0;
   background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0020 60%, #000 100%);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding: 24px 0;
   z-index: 200;
   overflow-y: auto;
   transition: background 0.5s;
